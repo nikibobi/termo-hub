@@ -48,7 +48,10 @@ namespace TermoHub
                 app.UseExceptionHandler("/error");
             }
 
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                ServeUnknownFileTypes = true
+            });
             app.UseMvc();
         }
     }
