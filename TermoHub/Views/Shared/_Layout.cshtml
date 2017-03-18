@@ -1,0 +1,18 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <environment names="Development">
+        <script src="https://d3js.org/d3.v4.js"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+    </environment>
+    <link href="/css/main.css" rel="stylesheet" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+    @RenderBody()
+</body>
+</html>

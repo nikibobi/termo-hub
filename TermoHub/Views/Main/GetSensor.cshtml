@@ -1,0 +1,15 @@
+﻿@model Sensor
+
+@{
+    Sensor sensor = Model;
+    ViewData["Title"] = sensor.NameOrId();
+}
+
+<h1 class="title">@ViewData["Title"]</h1>
+
+<svg id="chart"></svg>
+
+<script src="~/js/graph.js"></script>
+<script>
+    d3.json('@sensor.SensorId/data', chart);
+</script>

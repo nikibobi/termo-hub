@@ -1,0 +1,104 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.title {
+    padding-bottom: 0px;
+    border-bottom: 6px solid seagreen;
+    display: inline-block;
+    margin: 24px 0 auto;
+    transition: border-bottom-color 0.2s ease;
+}
+
+.title:hover {
+    border-bottom-color: lightgreen;
+}
+
+ul.cards {
+    /* removes bullets and padding */
+    list-style: none;
+    padding: 0;
+
+    /* for div ordering */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+li.card {
+    display: inline-block;
+    background-color: seagreen;
+    transition: background-color 0.25s ease-out;
+    border: 1px solid darkgreen;
+    border-radius: 4px;
+    /* sizeing */
+    padding: 2px 5px;
+    margin: 5px;
+    width: 300px;
+    height: 90px;
+}
+
+li.card:hover {
+    background-color: lightgreen;
+    cursor: pointer;
+}
+
+.card-title {
+    text-align: center;
+    margin: 0;
+    color: white;
+}
+
+.card-id {
+    text-align: center;
+    margin: 0;
+    font-size: 0.7em;
+    color: white;
+    opacity: 0.5;
+}
+
+.temp {
+    text-align: center;
+    margin: 0;
+    font-size: 3em;
+    white-space: nowrap;
+}
+
+.temp-value {
+    color: cornflowerblue;
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+}
+
+.temp-unit {
+    color: white;
+    opacity: 0.5;
+}
+
+/* termometer icon fill and outline */
+.icon-in {
+    fill: cornflowerblue;
+}
+
+.icon-out {
+    fill: white;
+}
+
+/* for svg chart */
+.line {
+    fill: none;
+    stroke: #F0F;
+    stroke-width: 2px;
+}
+
+#chart {
+    margin: 10px 2.5%;
+    width: 95%;
+    height: auto;
+    min-height: 500px;
+    background-color: rgb(240, 240, 240); /* for debuging */ 
+}

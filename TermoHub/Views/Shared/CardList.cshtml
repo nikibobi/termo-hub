@@ -1,0 +1,8 @@
+﻿@model IEnumerable<Card>
+
+<ul class="cards">
+    @foreach (var card in Model)
+    {
+        @Html.Partial("Card", model: card);
+    }
+</ul>
