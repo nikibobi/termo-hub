@@ -85,12 +85,12 @@ namespace TermoHub
         [Route("/{devId}/{senId}/data")]
         public IActionResult GetData([FromRoute] int devId, [FromRoute] int senId, [FromQuery] DateTime? t)
         {
-            DateTime date = t.GetValueOrDefault(DateTime.MinValue);
+            DateTime date = t.GetValueOrDefault(DateTime.Now).ToUniversalTime();
             var data = from r in context.Readings
                        where r.DeviceId == devId
                        where r.SensorId == senId
-                       where date < r.Time
-                       select new { r.Time, r.Value };
+                       where date < r.Time.ToUniversalTime()
+                       select new { Time = r.Time.ToUniversalTime(), r.Value };
             return Json(data.ToList());
         }
 

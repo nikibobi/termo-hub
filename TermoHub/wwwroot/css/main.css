@@ -87,18 +87,3 @@ li.card:hover {
 .icon-out {
     fill: white;
 }
-
-/* for svg chart */
-.line {
-    fill: none;
-    stroke: #F0F;
-    stroke-width: 2px;
-}
-
-#chart {
-    margin: 10px 2.5%;
-    width: 95%;
-    height: auto;
-    min-height: 500px;
-    background-color: rgb(240, 240, 240); /* for debuging */ 
-}
