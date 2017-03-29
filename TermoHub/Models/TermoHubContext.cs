@@ -7,7 +7,9 @@ namespace TermoHub.Models
     {
         public TermoHubContext(DbContextOptions<TermoHubContext> options)
             : base(options)
-        { }
+        {
+            Database.EnsureCreated();
+        }
 
         public DbSet<Device> Devices { get; set; }
         public DbSet<Sensor> Sensors { get; set; }
