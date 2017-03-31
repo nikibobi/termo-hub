@@ -3,10 +3,15 @@ ds = require('ds18b20')
 wifi.setmode(wifi.STATION)
 wifi.sta.autoconnect(1)
 
-url = 'http://192.168.1.52:53640/new'
+url = 'http://192.168.2.3:5000/new'
 device = node.chipid()
 ds.setup(4)
 addrs = ds.addrs()
+
+-- initial read to debounce values
+for i, addr in ipairs(addrs) do
+	ds.read(addr)
+end
 
 local job = tmr.create()
 job:register(5000, tmr.ALARM_AUTO, function()
