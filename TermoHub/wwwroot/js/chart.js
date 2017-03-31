@@ -55,6 +55,7 @@
     };
     let chart = new Chart.Line(ctx, { data, options });
     let last = new Date();
+    last.setMilliseconds(last.getMilliseconds() - maxPoints * interval);
 
     setInterval(function () {
         if (chart.data.labels.length > 0) {
