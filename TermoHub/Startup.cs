@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Globalization;
+using TermoHub.Formatters;
 using TermoHub.Models;
 
 namespace TermoHub
@@ -31,7 +31,11 @@ namespace TermoHub
 
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<TermoHubContext>(options => options.UseSqlServer(connection));
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.OutputFormatters.Add(new CsvOutputFormatter());
+                options.FormatterMappings.SetMediaTypeMappingForFormat("csv", "text/csv");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
