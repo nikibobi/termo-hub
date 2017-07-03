@@ -3,12 +3,32 @@
 @{
     Sensor sensor = Model;
     ViewData["Title"] = sensor.NameOrId();
+    var from = (string)ViewData["from"];
+    var to = (string)ViewData["to"];
 }
 
 <h1 class="title">@ViewData["Title"]</h1>
 
+<p><a href="@sensor.SensorId/live">Live</a></p>
+
+<form action="@sensor.SensorId" method="get">
+    <label for="from">
+        From:
+        <input type="datetime-local" id="from" name="from" value="@from"/>
+    </label>
+    <label for="to">
+        To:
+        <input type="datetime-local" id="to" name="to" value="@to"/>
+    </label>
+
+    <input type="submit"/>
+</form>
+
 <canvas id="canvas" width="300" height="130"></canvas>
 
 <script>
-    makeChart(60, '°C', 5000, '@sensor.SensorId/data');
+    function value(id) {
+        return d3.select(id).property('value');
+    }
+    makeChartStatic(value('#from'), value('#to'), '@sensor.SensorId/data');
 </script>

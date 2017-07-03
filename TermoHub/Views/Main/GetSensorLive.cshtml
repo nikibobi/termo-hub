@@ -1,0 +1,14 @@
+﻿@model Sensor
+
+@{
+    Sensor sensor = Model;
+    ViewData["Title"] = sensor.NameOrId();
+}
+
+<h1 class="title">@ViewData["Title"] Live</h1>
+
+<canvas id="canvas" width="300" height="130"></canvas>
+
+<script>
+    makeChartLive(60, 5000, '@sensor.SensorId/data');
+</script>

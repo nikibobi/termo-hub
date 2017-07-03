@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using TermoHub.Models;
 using TermoHub.ViewModels;
+using System.Collections.Generic;
 
 namespace TermoHub
 {
@@ -67,7 +68,21 @@ namespace TermoHub
 
         // GET: /devId/senId
         [Route("/{devId}/{senId}")]
-        public IActionResult GetSensor([FromRoute] int devId, [FromRoute] int senId)
+        public IActionResult GetSensor([FromRoute] int devId, [FromRoute] int senId, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        {
+            ViewData["from"] = from.ToUtcString();
+            ViewData["to"] = to.ToUtcString();
+            return HandleSensor(devId, senId);
+        }
+
+        // GET: /devId/senId/live
+        [Route("/{devId}/{senId}/live")]
+        public IActionResult GetSensorLive([FromRoute] int devId, [FromRoute] int senId)
+        {
+            return HandleSensor(devId, senId);
+        }
+
+        private IActionResult HandleSensor(int devId, int senId)
         {
             switch (context.Sensors.Find(devId, senId))
             {
@@ -81,17 +96,18 @@ namespace TermoHub
             }
         }
 
-        // GET: /devId/senId/data?t=
+        // GET: /devId/senId/data?from=&to=
         [Route("/{devId}/{senId}/data")]
-        public IActionResult GetData([FromRoute] int devId, [FromRoute] int senId, [FromQuery] DateTime? t)
+        public IEnumerable<TimeValuePair<double>> GetData([FromRoute] int devId, [FromRoute] int senId, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
-            DateTime date = t.GetValueOrDefault(DateTime.Now).ToUniversalTime();
-            var data = from r in context.Readings
-                       where r.DeviceId == devId
-                       where r.SensorId == senId
-                       where date < r.Time.ToUniversalTime()
-                       select new { Time = r.Time.ToUniversalTime(), r.Value };
-            return Json(data.ToList());
+            from = from.GetValueOrDefault().ToUniversalTime();
+            to = to.GetValueOrDefault(DateTime.Now).ToUniversalTime();
+            return from r in context.Readings
+                   where r.DeviceId == devId
+                   where r.SensorId == senId
+                   let time = r.Time.ToUniversalTime()
+                   where @from < time && time < @to
+                   select new TimeValuePair<double>(time, r.Value);
         }
 
         [Route("/error")]
