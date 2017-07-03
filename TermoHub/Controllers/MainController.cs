@@ -98,7 +98,8 @@ namespace TermoHub
         }
 
         // GET: /devId/senId/data?from=&to=
-        [Route("/{devId}/{senId}/data")]
+        [FormatFilter]
+        [Route("/{devId}/{senId}/data.{format}")]
         public IEnumerable<TimeValuePair<double>> GetData([FromRoute] int devId, [FromRoute] int senId, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
             from = from.GetValueOrDefault().ToUniversalTime();

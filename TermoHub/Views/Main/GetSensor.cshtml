@@ -7,11 +7,15 @@
     var toDate = (DateTime?)ViewData["to"];
     string from = fromDate.ToUtcString();
     string to = toDate.ToUtcString();
+    string filename = $"report{fromDate:ddMMyy}-{toDate:ddMMyy}.csv"; 
 }
 
 <h1 class="title">@ViewData["Title"]</h1>
 
-<p><a href="@sensor.SensorId/live">Live</a></p>
+<p>
+    <a href="@sensor.SensorId/live">Live</a>
+    <a href="@sensor.SensorId/data.csv?from=@from&to=@to" download="@filename">Report</a>
+</p>
 
 <form action="@sensor.SensorId" method="get">
     <label for="from">
@@ -32,5 +36,5 @@
     function value(id) {
         return d3.select(id).property('value');
     }
-    makeChartStatic(value('#from'), value('#to'), '@sensor.SensorId/data');
+    makeChartStatic(value('#from'), value('#to'), '@sensor.SensorId/data.json');
 </script>
