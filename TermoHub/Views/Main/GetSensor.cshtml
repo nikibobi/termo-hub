@@ -3,8 +3,10 @@
 @{
     Sensor sensor = Model;
     ViewData["Title"] = sensor.NameOrId();
-    var from = (string)ViewData["from"];
-    var to = (string)ViewData["to"];
+    var fromDate = (DateTime?)ViewData["from"];
+    var toDate = (DateTime?)ViewData["to"];
+    string from = fromDate.ToUtcString();
+    string to = toDate.ToUtcString();
 }
 
 <h1 class="title">@ViewData["Title"]</h1>

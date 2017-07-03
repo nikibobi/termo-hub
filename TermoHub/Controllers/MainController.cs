@@ -71,8 +71,8 @@ namespace TermoHub
         [Route("/{devId}/{senId}")]
         public IActionResult GetSensor([FromRoute] int devId, [FromRoute] int senId, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
-            ViewData["from"] = from.ToUtcString();
-            ViewData["to"] = to.ToUtcString();
+            ViewData["from"] = from;
+            ViewData["to"] = to;
             return HandleSensor(devId, senId);
         }
 
