@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
+using TermoHub.Models;
 
-namespace TermoHub.Models
+namespace TermoHub.Extensions
 {
     public static class ModelExtensions
     {
@@ -14,11 +14,6 @@ namespace TermoHub.Models
             builder
                 .IsUnicode(true)
                 .HasMaxLength(80);
-        }
-
-        public static string ToUtcString(this DateTime? date)
-        {
-            return date?.ToString("yyyy-MM-ddTHH:mm:ss") ?? String.Empty;
         }
     }
 }
