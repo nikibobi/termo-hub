@@ -9,7 +9,7 @@ namespace TermoHub.Models
         public TermoHubContext(DbContextOptions<TermoHubContext> options)
             : base(options)
         {
-            Database.EnsureCreated();
+            Database.Migrate();
         }
 
         public DbSet<Device> Devices { get; set; }
