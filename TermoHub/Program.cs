@@ -13,7 +13,6 @@ namespace TermoHub
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .UseUrls("http://0.0.0.0:5000")
-                .UseApplicationInsights()
                 .Build();
 
             host.Run();
