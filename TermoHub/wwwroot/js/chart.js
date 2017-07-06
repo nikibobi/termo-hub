@@ -37,9 +37,9 @@ function makeChart(id) {
                 label: 'Temp',
                 fill: false,
                 backgroundColor: 'lightgreen',
-                pointRadius: 6,
-                pointHoverRadius: 6,
-                pointBorderWidth: 2,
+                pointRadius: 2,
+                pointHoverRadius: 2,
+                pointBorderWidth: 1,
                 borderColor: 'seagreen',
                 pointBorderColor: 'seagreen',
                 pointHoverBorderColor: 'white',
@@ -54,10 +54,12 @@ function makeChart(id) {
             xAxes: [{
                 type: 'time',
                 time: {
-                    tooltipFormat: 'D/M/YYYY HH:mm:ss',
-                    unit: 'minute',
+                    tooltipFormat: 'L LTS',
                     displayFormats: {
-                        minute: 'HH:mm'
+                        second: 'LTS',
+                        minute: 'LT',
+                        hour: 'Do H:mm',
+                        day: 'MMM Do LT'
                     }
                 }
             }],
