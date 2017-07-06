@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using TermoHub.Models;
+using System.Threading.Tasks;
 
 namespace TermoHub
 {
@@ -16,24 +17,24 @@ namespace TermoHub
         // POST /new
         [Route("new")]
         [HttpPost]
-        public void Post([FromBody][Bind("DeviceId,SensorId,Value")]Reading reading)
+        public async Task Post([FromBody][Bind("DeviceId,SensorId,Value")]Reading reading)
         {
-            using (var transaction = context.Database.BeginTransaction())
+            using (var transaction = await context.Database.BeginTransactionAsync())
             {
                 try
                 {
                     if (ModelState.IsValid)
                     {
-                        Device device = context.Devices.Find(reading.DeviceId);
+                        Device device = await context.Devices.FindAsync(reading.DeviceId);
                         if (device == null)
                         {
                             device = new Device()
                             {
                                 DeviceId = reading.DeviceId
                             };
-                            context.Devices.Add(device);
+                            await context.Devices.AddAsync(device);
                         }
-                        Sensor sensor = context.Sensors.Find(reading.DeviceId, reading.SensorId);
+                        Sensor sensor = await context.Sensors.FindAsync(reading.DeviceId, reading.SensorId);
                         if (sensor == null)
                         {
                             sensor = new Sensor()
@@ -41,11 +42,11 @@ namespace TermoHub
                                 DeviceId = reading.DeviceId,
                                 SensorId = reading.SensorId
                             };
-                            context.Sensors.Add(sensor);
+                            await context.Sensors.AddAsync(sensor);
                         }
                         
-                        context.Readings.Add(reading);
-                        context.SaveChanges();
+                        await context.Readings.AddAsync(reading);
+                        await context.SaveChangesAsync();
                         transaction.Commit();
                     }
                 }
