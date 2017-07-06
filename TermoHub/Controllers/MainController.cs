@@ -10,6 +10,8 @@ namespace TermoHub
 {
     public class MainController : Controller
     {
+        private static readonly TimeSpan HistoryInterval = TimeSpan.FromHours(6);
+
         private readonly TermoHubContext context;
 
         public MainController(TermoHubContext context)
@@ -71,8 +73,7 @@ namespace TermoHub
         [Route("/{devId}/{senId}")]
         public IActionResult GetSensor([FromRoute] int devId, [FromRoute] int senId, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
-            ViewData["from"] = from;
-            ViewData["to"] = to;
+            (ViewData["from"], ViewData["to"]) = DefaultDates(from, to);
             return HandleSensor(devId, senId);
         }
 
@@ -102,14 +103,21 @@ namespace TermoHub
         [Route("/{devId}/{senId}/data.{format}")]
         public IEnumerable<TimeValuePair<double>> GetData([FromRoute] int devId, [FromRoute] int senId, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
-            from = from.GetValueOrDefault().ToUniversalTime();
-            to = to.GetValueOrDefault(DateTime.Now).ToUniversalTime();
+            var dates = DefaultDates(from, to);
+            DateTime fromUtc = dates.from.ToUniversalTime();
+            DateTime toUtc = dates.to.ToUniversalTime();
             return from r in context.Readings
                    where r.DeviceId == devId
                    where r.SensorId == senId
-                   let time = r.Time.ToUniversalTime()
-                   where @from < time && time < @to
-                   select new TimeValuePair<double>(time, r.Value);
+                   where fromUtc < r.Time && r.Time < toUtc
+                   select new TimeValuePair<double>(r.Time.ToLocalTime(), r.Value);
+        }
+
+        private static (DateTime from, DateTime to) DefaultDates(DateTime? fromNullable, DateTime? toNullable)
+        {
+            DateTime to = toNullable.GetValueOrDefault(DateTime.Now);
+            DateTime from = fromNullable.GetValueOrDefault(to.Subtract(HistoryInterval));
+            return (from, to);
         }
 
         [Route("/error")]
