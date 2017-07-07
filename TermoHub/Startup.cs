@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Globalization;
 using TermoHub.Formatters;
 using TermoHub.Models;
+using TermoHub.Services;
 
 namespace TermoHub
 {
@@ -36,6 +37,7 @@ namespace TermoHub
                 options.OutputFormatters.Add(new CsvOutputFormatter());
                 options.FormatterMappings.SetMediaTypeMappingForFormat("csv", "text/csv");
             });
+            services.AddSingleton<ILastValues, LastValues>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
