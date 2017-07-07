@@ -7,6 +7,8 @@ namespace TermoHub
 {
     public class ApiController : Controller
     {
+        private const int SleepSeconds = 10;
+
         private readonly TermoHubContext context;
 
         public ApiController(TermoHubContext context)
@@ -17,7 +19,7 @@ namespace TermoHub
         // POST /new
         [Route("new")]
         [HttpPost]
-        public async Task Post([FromBody][Bind("DeviceId,SensorId,Value")]Reading reading)
+        public async Task<IActionResult> Post([FromBody][Bind("DeviceId,SensorId,Value")]Reading reading)
         {
             using (var transaction = await context.Database.BeginTransactionAsync())
             {
@@ -48,6 +50,7 @@ namespace TermoHub
                         await context.Readings.AddAsync(reading);
                         await context.SaveChangesAsync();
                         transaction.Commit();
+                        return Ok(SleepSeconds);
                     }
                 }
                 catch (Exception)
@@ -55,6 +58,7 @@ namespace TermoHub
                     transaction.Rollback();
                 }
             }
+            return BadRequest();
         }
     }
 }
