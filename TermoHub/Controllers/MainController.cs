@@ -10,7 +10,7 @@ namespace TermoHub
 {
     public class MainController : Controller
     {
-        private static readonly TimeSpan HistoryInterval = TimeSpan.FromHours(6);
+        private static readonly TimeSpan HistoryInterval = TimeSpan.FromHours(3);
 
         private readonly TermoHubContext context;
 
