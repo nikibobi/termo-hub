@@ -6,6 +6,8 @@ namespace TermoHub.Models
 {
     public class TermoHubContext : DbContext
     {
+        private const int DefaultDelaySeconds = 30;
+
         public TermoHubContext(DbContextOptions<TermoHubContext> options)
             : base(options)
         {
@@ -26,6 +28,9 @@ namespace TermoHub.Models
                     .ValueGeneratedNever();
 
                 device.Property(d => d.Name).IsName();
+
+                device.Property(d => d.DelaySeconds)
+                    .HasDefaultValue(DefaultDelaySeconds);
 
                 device.HasKey(d => d.DeviceId);
 
