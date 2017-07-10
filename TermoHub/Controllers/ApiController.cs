@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TermoHub.Models;
 using System.Threading.Tasks;
+using TermoHub.Services;
 
 namespace TermoHub
 {
@@ -10,10 +11,12 @@ namespace TermoHub
         private const int SleepSeconds = 10;
 
         private readonly TermoHubContext context;
+        private readonly ILastValues lastValues;
 
-        public ApiController(TermoHubContext context)
+        public ApiController(TermoHubContext context, ILastValues lastValues)
         {
             this.context = context;
+            this.lastValues = lastValues;
         }
 
         // POST /new
@@ -50,6 +53,7 @@ namespace TermoHub
                         await context.Readings.AddAsync(reading);
                         await context.SaveChangesAsync();
                         transaction.Commit();
+                        lastValues.SetSensorLastValue(reading.DeviceId, reading.SensorId, reading.Value);
                         return Ok(SleepSeconds);
                     }
                 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TermoHub.Extensions;
 using TermoHub.Models;
+using TermoHub.Services;
 using TermoHub.ViewModels;
 
 namespace TermoHub
@@ -13,10 +14,12 @@ namespace TermoHub
         private static readonly TimeSpan HistoryInterval = TimeSpan.FromHours(3);
 
         private readonly TermoHubContext context;
+        private readonly ILastValues lastValues;
 
-        public MainController(TermoHubContext context)
+        public MainController(TermoHubContext context, ILastValues lastValues)
         {
             this.context = context;
+            this.lastValues = lastValues;
         }
 
         // GET: /
@@ -28,10 +31,7 @@ namespace TermoHub
                 Title = d.NameOrId(),
                 Id = d.DeviceId,
                 Url = $"/{d.DeviceId}",
-                Value = (from r in context.Readings
-                         where r.DeviceId == d.DeviceId
-                         orderby r.Time ascending
-                         select r.Value).LastOrDefault()
+                Value = lastValues.GetDeviceLastValuesAverage(d.DeviceId)
             });
             return View(model: cards);
         }
@@ -48,12 +48,6 @@ namespace TermoHub
                     context.Entry(device)
                         .Collection(d => d.Sensors)
                         .Load();
-                    foreach (var sensor in device.Sensors)
-                    {
-                        context.Entry(sensor)
-                            .Collection(s => s.Readings)
-                            .Load();
-                    }
 
                     ViewData["Title"] = device.NameOrId();
                     var cards = device.Sensors.Select(s => new Card()
@@ -61,9 +55,7 @@ namespace TermoHub
                         Title = s.NameOrId(),
                         Id = s.SensorId,
                         Url = $"/{s.DeviceId}/{s.SensorId}",
-                        Value = (from r in s.Readings
-                                 orderby r.Time ascending
-                                 select r.Value).LastOrDefault()
+                        Value = lastValues.GetSensorLastValue(s.DeviceId, s.SensorId)
                     });
                     return View(model: cards);
             }
