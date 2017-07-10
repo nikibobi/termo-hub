@@ -8,8 +8,6 @@ namespace TermoHub
 {
     public class ApiController : Controller
     {
-        private const int SleepSeconds = 10;
-
         private readonly TermoHubContext context;
         private readonly ILastValues lastValues;
 
@@ -54,7 +52,7 @@ namespace TermoHub
                         await context.SaveChangesAsync();
                         transaction.Commit();
                         lastValues.SetSensorLastValue(reading.DeviceId, reading.SensorId, reading.Value);
-                        return Ok(SleepSeconds);
+                        return Ok(device.DelaySeconds);
                     }
                 }
                 catch (Exception)
