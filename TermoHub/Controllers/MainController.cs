@@ -61,6 +61,36 @@ namespace TermoHub
             }
         }
 
+        // GET: /devId/settings
+        [HttpGet("/{devId}/settings")]
+        public IActionResult DeviceSettings([FromRoute] int devId)
+        {
+            switch (context.Devices.Find(devId))
+            {
+                case null:
+                    return NotFound();
+                case Device device:
+                    return View(model: device);
+            }
+        }
+
+        // POST: /devId/settings
+        [HttpPost("/{devId}/settings")]
+        public IActionResult DeviceSettings([FromRoute] int devId, [FromForm] string name, [FromForm] int delaySeconds)
+        {
+            switch (context.Devices.Find(devId))
+            {
+                case null:
+                    return NotFound();
+                case Device device:
+                    device.Name = name;
+                    device.DelaySeconds = delaySeconds;
+                    context.Update(device);
+                    context.SaveChanges();
+                    return Redirect($"/{devId}");
+            }
+        }
+
         // GET: /devId/senId
         [Route("/{devId}/{senId}")]
         public IActionResult GetSensor([FromRoute] int devId, [FromRoute] int senId, [FromQuery] DateTime? from, [FromQuery] DateTime? to)

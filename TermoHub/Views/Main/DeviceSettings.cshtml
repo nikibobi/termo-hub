@@ -1,0 +1,15 @@
+﻿@model Device
+
+<h1 class="title">Settings</h1>
+
+<form action="/@Model.DeviceId/settings" method="post">
+    <label>
+        Name:
+        <input type="text" name="name" value="@Model.Name" />
+    </label>
+    <label>
+        Delay (seconds):
+        <input type="number" name="delaySeconds" value="@Model.DelaySeconds" min="10" max="@(60 * 60)" />
+    </label>
+    <input type="submit" value="Update" />
+</form>
