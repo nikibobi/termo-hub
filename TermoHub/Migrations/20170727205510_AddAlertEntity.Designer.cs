@@ -8,9 +8,10 @@ using TermoHub.Models;
 namespace TermoHub.Migrations
 {
     [DbContext(typeof(TermoHubContext))]
-    partial class TermoHubContextModelSnapshot : ModelSnapshot
+    [Migration("20170727205510_AddAlertEntity")]
+    partial class AddAlertEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasDefaultSchema("dbo")

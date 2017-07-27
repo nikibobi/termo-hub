@@ -17,6 +17,7 @@ namespace TermoHub.Models
         public DbSet<Device> Devices { get; set; }
         public DbSet<Sensor> Sensors { get; set; }
         public DbSet<Reading> Readings { get; set; }
+        public DbSet<Alert> Alerts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -63,6 +64,25 @@ namespace TermoHub.Models
                     .HasDefaultValueSql("GETDATE()");
 
                 reading.HasKey(r => new { r.DeviceId, r.SensorId, r.Time });
+            });
+
+            modelBuilder.Entity<Alert>(alert =>
+            {
+                alert.Property(a => a.AlertId)
+                    .ValueGeneratedOnAdd();
+
+                alert.Property(a => a.Email)
+                    .IsUnicode()
+                    .HasMaxLength(320)
+                    .IsRequired();
+
+                alert.HasKey(a => a.AlertId);
+
+                alert
+                    .HasOne(a => a.Sensor)
+                    .WithOne(s => s.Alert)
+                    .HasForeignKey<Sensor>(s => s.AlertId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             base.OnModelCreating(modelBuilder);
