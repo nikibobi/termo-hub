@@ -8,7 +8,7 @@
             last = new Date(chart.data.labels[chart.data.labels.length - 1]);
         }
         const query = `?from=${encodeURI(last.toISOString())}`;
-        d3.json(url + query, function (data) {
+        $.get(url + query, function (data) {
             // add new data
             appendData(chart, data);
             // delete old data
@@ -21,7 +21,7 @@
 function makeChartStatic(from, to, url) {
     let chart = makeChart('canvas');
     const query = `?from=${from}&to=${to}`;
-    d3.json(url + query, function (data) {
+    $.get(url + query, function (data) {
         appendData(chart, data);
         chart.update();
     });

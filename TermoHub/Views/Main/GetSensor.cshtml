@@ -33,8 +33,5 @@
 <canvas id="canvas" width="300" height="130"></canvas>
 
 <script>
-    function value(id) {
-        return d3.select(id).property('value');
-    }
-    makeChartStatic(value('#from'), value('#to'), '@sensor.SensorId/data.json');
+    makeChartStatic($('#from').val(), $('#to').val(), '@sensor.SensorId/data.json');
 </script>
