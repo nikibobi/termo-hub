@@ -106,6 +106,47 @@ namespace TermoHub
             return HandleSensor(devId, senId);
         }
 
+        // GET: /devId/senId/settings
+        [HttpGet("/{devId}/{senId}/settings")]
+        public IActionResult SensorSettings([FromRoute] int devId, [FromRoute] int senId)
+        {
+            Sensor sensor = context.Sensors.Find(devId, senId);
+            if (sensor == null)
+                return NotFound();
+
+            context.Entry(sensor).Reference(s => s.Alert).Load();
+            return View(model: sensor);
+        }
+
+        // POST: /devId/senId/settings
+        [HttpPost("/{devId}/{senId}/settings")]
+        public IActionResult SensorSettings([FromRoute] int devId, [FromRoute] int senId, [FromForm] string name, [FromForm] bool hasAlert, [FromForm] Alert alert)
+        {
+            Sensor sensor = context.Sensors.Find(devId, senId);
+            if (sensor == null)
+                return NotFound();
+
+            context.Entry(sensor).Reference(s => s.Alert).Load();
+            sensor.Name = name;
+            if (hasAlert && sensor.Alert != null)
+            {
+                sensor.Alert.Sign = alert.Sign;
+                sensor.Alert.Limit = alert.Limit;
+                sensor.Alert.Email = alert.Email;
+            }
+            else if (hasAlert && sensor.Alert == null)
+            {
+                sensor.Alert = alert;
+            }
+            else if (!hasAlert && sensor.Alert != null)
+            {
+                context.Remove(sensor.Alert);
+            }
+            context.Update(sensor);
+            context.SaveChanges();
+            return Redirect($"/{devId}/{senId}");
+        }
+
         private IActionResult HandleSensor(int devId, int senId)
         {
             switch (context.Sensors.Find(devId, senId))

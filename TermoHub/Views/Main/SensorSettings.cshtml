@@ -1,0 +1,48 @@
+﻿@model Sensor
+
+<h1 class="title">Settings</h1>
+
+<form action="/@Model.DeviceId/@Model.SensorId/settings" method="post">
+    <label>
+        Name:
+        <input type="text" name="name" value="@Model.Name" />
+    </label>
+    <label>
+        Alert:
+        <input type="checkbox" id="has-alert" name="hasAlert" value="true" />
+        <input type="hidden" name="hasAlert" value="false" />
+    </label>
+    <div id="alert-section">
+        If value
+        <select id="alert-sign" name="alert[sign]">
+            <option value="1">></option>
+            <option value="-1"><</option>
+        </select>
+        <input type="number" id="alert-limit" name="alert[limit]" value="0" required />
+        then send e-mail to
+        <input type="email" id="alert-email" name="alert[email]" required />
+    </div>
+    <input type="submit" value="Update" />
+</form>
+
+<script>
+    $('#has-alert').change(function() {
+        $('#alert-section').toggle(this.checked);
+        $('#alert-section > :input').prop('disabled', !this.checked);
+    });
+@if (Model.Alert != null)
+{
+<text>
+    $('#has-alert').prop('checked', true).change();
+    $('#alert-sign option[value=@Model.Alert.Sign]').prop('selected', true);
+    $('#alert-limit').val(@Model.Alert.Limit);
+    $('#alert-email').val('@Model.Alert.Email');
+</text>
+}
+else
+{
+<text>
+    $('#has-alert').prop('checked', false).change();
+</text>
+}
+</script>
