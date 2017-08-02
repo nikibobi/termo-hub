@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Globalization;
 using TermoHub.Formatters;
 using TermoHub.Models;
+using TermoHub.Options;
 using TermoHub.Services;
 
 namespace TermoHub
@@ -30,13 +31,18 @@ namespace TermoHub
         {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
+            services.AddOptions();
+            services.Configure<EmailOptions>(Configuration.GetSection("Email"));
+
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<TermoHubContext>(options => options.UseSqlServer(connection));
+
             services.AddMvc(options =>
             {
                 options.OutputFormatters.Add(new CsvOutputFormatter());
                 options.FormatterMappings.SetMediaTypeMappingForFormat("csv", "text/csv");
             });
+
             services.AddSingleton<ILastValues, LastValues>();
         }
 
