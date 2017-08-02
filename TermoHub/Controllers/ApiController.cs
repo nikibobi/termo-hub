@@ -10,11 +10,13 @@ namespace TermoHub
     {
         private readonly TermoHubContext context;
         private readonly ILastValues lastValues;
+        private readonly IAlertReporter alertReporter;
 
-        public ApiController(TermoHubContext context, ILastValues lastValues)
+        public ApiController(TermoHubContext context, ILastValues lastValues, IAlertReporter alertReporter)
         {
             this.context = context;
             this.lastValues = lastValues;
+            this.alertReporter = alertReporter;
         }
 
         // POST /new
@@ -52,6 +54,7 @@ namespace TermoHub
                         await context.SaveChangesAsync();
                         transaction.Commit();
                         lastValues.SetSensorLastValue(reading.DeviceId, reading.SensorId, reading.Value);
+                        await alertReporter.Report(reading);
                         return Ok(device.DelaySeconds);
                     }
                 }

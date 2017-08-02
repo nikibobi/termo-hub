@@ -45,6 +45,7 @@ namespace TermoHub
 
             services.AddSingleton<ILastValues, LastValues>();
             services.AddTransient<IEmailSender, MailKitEmailService>();
+            services.AddTransient<IAlertReporter, AlertReporter>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
