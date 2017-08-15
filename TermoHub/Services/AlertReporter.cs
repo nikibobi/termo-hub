@@ -21,7 +21,7 @@ namespace TermoHub.Services
         public async Task Report(Reading reading)
         {
             if (reading == null)
-                throw new NullReferenceException("reading can't be null");
+                throw new ArgumentNullException(nameof(reading));
 
             await context.Entry(reading).Reference(r => r.Sensor).LoadAsync();
             Sensor sensor = reading.Sensor;
