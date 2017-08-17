@@ -1,30 +1,26 @@
-﻿function makeChartLive(maxPoints, interval, url) {
+﻿async function makeChartLive(baseUrl, maxPoints, interval) {
     let chart = makeChart('canvas');
-    let last = new Date();
-    last.setMilliseconds(last.getMilliseconds() - maxPoints * interval);
+    setInterval(tick, interval);
 
-    setInterval(function () {
-        if (chart.data.labels.length > 0) {
-            last = new Date(chart.data.labels[chart.data.labels.length - 1]);
+    async function tick() {
+        await updateChart.call(chart, baseUrl, getFromDate(chart.data.labels), null, maxPoints); 
+    }
+
+    function getFromDate(points) {
+        let date;
+        if (points.length > 0) {
+            date = new Date(points[points.length - 1]);
+        } else {
+            date = new Date();
+            date.setMilliseconds(date.getMilliseconds() - maxPoints * interval);
         }
-        const query = `?from=${encodeURI(last.toISOString())}`;
-        $.get(url + query, function (data) {
-            // add new data
-            appendData(chart, data);
-            // delete old data
-            discardData(chart, chart.data.labels.length - maxPoints);
-            chart.update();
-        });
-    }, interval);
+        return date.toISOString();
+    }
 }
 
-function makeChartStatic(from, to, url) {
+async function makeChartStatic(baseUrl, from, to) {
     let chart = makeChart('canvas');
-    const query = `?from=${from}&to=${to}`;
-    $.get(url + query, function (data) {
-        appendData(chart, data);
-        chart.update();
-    });
+    await updateChart.call(chart, baseUrl, from, to, Infinity);
 }
 
 function makeChart(id) {
@@ -33,20 +29,8 @@ function makeChart(id) {
     const data = {
         labels: [],
         datasets: [
-            {
-                label: 'Temp',
-                fill: false,
-                backgroundColor: 'lightgreen',
-                pointRadius: 2,
-                pointHoverRadius: 2,
-                pointBorderWidth: 1,
-                borderColor: 'seagreen',
-                pointBorderColor: 'seagreen',
-                pointHoverBorderColor: 'white',
-                pointBackgroundColor: 'lightgreen',
-                pointHoverBackgroundColor: 'seagreen',
-                data: []
-            }
+            makeDataset('Temp', 'seagreen', 'lightgreen'),
+            makeDataset('Alert', 'red', '#ffa07a')
         ]
     };
     const options = {
@@ -54,9 +38,12 @@ function makeChart(id) {
             xAxes: [{
                 type: 'time',
                 time: {
+                    unit: 'second',
+                    unitStepSize: 60,
+                    round: 'second',
                     tooltipFormat: 'L LTS',
                     displayFormats: {
-                        second: 'LTS',
+                        second: 'LT',
                         minute: 'LT',
                         hour: 'Do H:mm',
                         day: 'MMM Do LT'
@@ -87,22 +74,92 @@ function makeChart(id) {
     };
     let chart = new Chart.Line(ctx, { data, options });
     return chart;
-}
 
-function appendData(chart, data) {
-    for (let d of data) {
-        chart.data.labels.push(Date.parse(d.time));
-        for (let dataset of chart.data.datasets) {
-            dataset.data.push(d.value);
+    function makeDataset(name, mainColor, altColor) {
+        return {
+            label: name,
+            fill: false,
+            backgroundColor: altColor,
+            pointRadius: 2,
+            pointHoverRadius: 2,
+            pointBorderWidth: 1,
+            borderColor: mainColor,
+            pointBorderColor: mainColor,
+            pointHoverBorderColor: 'white',
+            pointBackgroundColor: altColor,
+            pointHoverBackgroundColor: mainColor,
+            spanGaps: true, // used to draw lines where data is null
+            data: []
         }
     }
 }
 
-function discardData(chart, n) {
-    if (n <= 0)
-        return;
-    chart.data.labels.shift(n);
-    for (let dataset of chart.data.datasets) {
-        dataset.data.shift(n);
+async function updateChart(baseUrl, from, to, maxPoints) {
+    let points = this.data.labels;
+    const data = await getDataJson(baseUrl, from, to);
+    const alert = await getAlertJson(baseUrl);
+    // add new data
+    appendData.call(this, data);
+    if (alert != null) {
+        const n = points.length;
+        // update alert line
+        appendAlert.call(this, alert, n);
+    }
+    if (points.length > maxPoints) {
+        const n = points.length - maxPoints;
+        // delete old data
+        discardData.call(this, n);
+    }
+    this.update();
+}
+
+function getAlertJson(baseUrl) {
+    const url = `${baseUrl}/alert`;
+    return $.get(url);
+}
+
+function getDataJson(baseUrl, from, to) {
+    const url = `${baseUrl}/data.json?from=${encodeURI(from)}&to=${encodeURI(to)}`;
+    return $.get(url);
+}
+
+function appendData(data) {
+    let labels = this.data.labels;
+    let dataset = this.data.datasets[0];
+    for (let d of data) {
+        labels.push(Date.parse(d.time));
+        dataset.data.push(d.value);
+    }
+}
+
+function appendAlert(alert, n) {
+    let dataset = this.data.datasets[1];
+    dataset.fill = getAlertFill(alert.sign);
+
+    // insert nulls at [1]
+    while (dataset.data.length < n) {
+        dataset.data.splice(1, 0, null);
+    }
+    // set first and last point to alert's value
+    dataset.data[0] = alert.value;
+    dataset.data[dataset.data.length - 1] = alert.value;
+
+    function getAlertFill(sign) {
+        if (sign < 0) {
+            return 'bottom';
+        } else if (sign > 0) {
+            return 'top';
+        } else {
+            return false;
+        }
+    }
+}
+
+function discardData(n) {
+    let labels = this.data.labels;
+    let dataset = this.data.datasets[0];
+    for (let i = 0; i < n; i++) {
+        labels.shift();
+        dataset.data.shift();
     }
 }
