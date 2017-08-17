@@ -23,7 +23,7 @@ namespace TermoHub
         }
 
         // GET: /
-        [Route("/")]
+        [HttpGet("/")]
         public IActionResult Index()
         {
             var cards = context.Devices.Select(d => new Card()
@@ -37,73 +37,73 @@ namespace TermoHub
         }
 
         // GET: /devId
-        [Route("/{devId}")]
+        [HttpGet("/{devId}")]
         public IActionResult GetDevice([FromRoute] int devId)
         {
-            switch (context.Devices.Find(devId))
-            {
-                case null:
-                    return NotFound();
-                case Device device:
-                    context.Entry(device)
-                        .Collection(d => d.Sensors)
-                        .Load();
+            Device device = context.Devices.Find(devId);
+            if (device == null)
+                return NotFound();
 
-                    ViewData["Title"] = device.NameOrId();
-                    var cards = device.Sensors.Select(s => new Card()
-                    {
-                        Title = s.NameOrId(),
-                        Id = s.SensorId,
-                        Url = $"/{s.DeviceId}/{s.SensorId}",
-                        Value = lastValues.GetSensorLastValue(s.DeviceId, s.SensorId)
-                    });
-                    return View(model: cards);
-            }
+            context.Entry(device).Collection(d => d.Sensors).Load();
+            ViewData["Title"] = device.NameOrId();
+            var cards = device.Sensors.Select(s => new Card()
+            {
+                Title = s.NameOrId(),
+                Id = s.SensorId,
+                Url = $"/{s.DeviceId}/{s.SensorId}",
+                Value = lastValues.GetSensorLastValue(s.DeviceId, s.SensorId)
+            });
+            return View(model: cards);
         }
 
         // GET: /devId/settings
         [HttpGet("/{devId}/settings")]
         public IActionResult DeviceSettings([FromRoute] int devId)
         {
-            switch (context.Devices.Find(devId))
-            {
-                case null:
-                    return NotFound();
-                case Device device:
-                    return View(model: device);
-            }
+            Device device = context.Devices.Find(devId);
+            if (device == null)
+                return NotFound();
+
+            return View(model: device);
         }
 
         // POST: /devId/settings
         [HttpPost("/{devId}/settings")]
         public IActionResult DeviceSettings([FromRoute] int devId, [FromForm] string name, [FromForm] int delaySeconds)
         {
-            switch (context.Devices.Find(devId))
-            {
-                case null:
-                    return NotFound();
-                case Device device:
-                    device.Name = name;
-                    device.DelaySeconds = delaySeconds;
-                    context.Update(device);
-                    context.SaveChanges();
-                    return Redirect($"/{devId}");
-            }
+            Device device = context.Devices.Find(devId);
+            if (device == null)
+                return NotFound();
+
+            device.Name = name;
+            device.DelaySeconds = delaySeconds;
+            context.Update(device);
+            context.SaveChanges();
+            return Redirect($"/{devId}");
         }
 
         // GET: /devId/senId
-        [Route("/{devId}/{senId}")]
+        [HttpGet("/{devId}/{senId}")]
         public IActionResult GetSensor([FromRoute] int devId, [FromRoute] int senId, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
+            Sensor sensor = context.Sensors.Find(devId, senId);
+            if (sensor == null)
+                return NotFound();
+
             (ViewData["from"], ViewData["to"]) = DefaultDates(from, to);
-            return HandleSensor(devId, senId);
+
+            return View(model: sensor);
         }
 
         // GET: /devId/senId/live
-        [Route("/{devId}/{senId}/live")]
+        [HttpGet("/{devId}/{senId}/live")]
         public IActionResult GetSensorLive([FromRoute] int devId, [FromRoute] int senId)
         {
-            return HandleSensor(devId, senId);
+            Sensor sensor = context.Sensors.Find(devId, senId);
+            if (sensor == null)
+                return NotFound();
+
+            return View(model: sensor);
         }
 
         // GET: /devId/senId/settings
@@ -147,23 +147,9 @@ namespace TermoHub
             return Redirect($"/{devId}/{senId}");
         }
 
-        private IActionResult HandleSensor(int devId, int senId)
-        {
-            switch (context.Sensors.Find(devId, senId))
-            {
-                case null:
-                    return NotFound();
-                case Sensor sensor:
-                    context.Entry(sensor)
-                        .Collection(s => s.Readings)
-                        .Load();
-                    return View(model: sensor);
-            }
-        }
-
         // GET: /devId/senId/data?from=&to=
         [FormatFilter]
-        [Route("/{devId}/{senId}/data.{format}")]
+        [HttpGet("/{devId}/{senId}/data.{format}")]
         public IEnumerable<TimeValuePair<double>> GetData([FromRoute] int devId, [FromRoute] int senId, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
             var dates = DefaultDates(from, to);
@@ -183,6 +169,7 @@ namespace TermoHub
             Sensor sensor = context.Sensors.Find(devId, senId);
             if (sensor == null)
                 return NotFound();
+
             context.Entry(sensor).Reference(s => s.Alert).Load();
             Alert alert = sensor.Alert;
             if (alert == null)

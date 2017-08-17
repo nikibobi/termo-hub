@@ -20,8 +20,7 @@ namespace TermoHub
         }
 
         // POST /new
-        [Route("new")]
-        [HttpPost]
+        [HttpPost("/new")]
         public async Task<IActionResult> Post([FromBody][Bind("DeviceId,SensorId,Value")]Reading reading)
         {
             using (var transaction = await context.Database.BeginTransactionAsync())
