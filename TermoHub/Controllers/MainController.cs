@@ -176,6 +176,21 @@ namespace TermoHub
                    select new TimeValuePair<double>(r.Time.ToLocalTime(), r.Value);
         }
 
+        // GET: /devId/senId/alert
+        [HttpGet("/{devId}/{senId}/alert")]
+        public IActionResult GetAlert([FromRoute] int devId, [FromRoute] int senId)
+        {
+            Sensor sensor = context.Sensors.Find(devId, senId);
+            if (sensor == null)
+                return NotFound();
+            context.Entry(sensor).Reference(s => s.Alert).Load();
+            Alert alert = sensor.Alert;
+            if (alert == null)
+                return Json(data: null);
+
+            return Json(data: new { Value = alert.Limit, Sign = alert.Sign });
+        }
+
         private static (DateTime from, DateTime to) DefaultDates(DateTime? fromNullable, DateTime? toNullable)
         {
             DateTime to = toNullable.GetValueOrDefault(DateTime.Now);
