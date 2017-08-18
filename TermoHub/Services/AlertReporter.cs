@@ -1,19 +1,21 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Threading.Tasks;
 using TermoHub.Extensions;
 using TermoHub.Models;
+using TermoHub.Options;
 
 namespace TermoHub.Services
 {
     public class AlertReporter : IAlertReporter
     {
-        private const string Subject = "Alert!";
-
+        private readonly ReporterOptions options;
         private readonly TermoHubContext context;
         private readonly IEmailSender emailSender;
 
-        public AlertReporter(TermoHubContext context, IEmailSender emailSender)
+        public AlertReporter(IOptions<ReporterOptions> options, TermoHubContext context, IEmailSender emailSender)
         {
+            this.options = options.Value;
             this.context = context;
             this.emailSender = emailSender;
         }
@@ -27,11 +29,35 @@ namespace TermoHub.Services
             Sensor sensor = reading.Sensor;
             await context.Entry(sensor).Reference(s => s.Alert).LoadAsync();
             Alert alert = sensor.Alert;
-            if (alert != null && alert.Check(reading.Value))
+            if (alert != null)
             {
-                string message = $"{sensor.NameOrId()} reached limit {alert.Limit} with {reading.Value}";
-                await emailSender.SendEmailAsync(alert.Email, Subject, message);
+                if (alert.Check(reading.Value))
+                {
+                    if (!alert.IsNotified)
+                    {
+                        string message = FormatMessage(sensor, alert, reading);
+                        await emailSender.SendEmailAsync(alert.Email, options.Subject, message);
+                        alert.IsNotified = true;
+                        await context.SaveChangesAsync();
+                    }
+                }
+                else
+                {
+                    if (alert.IsNotified)
+                    {
+                        alert.IsNotified = false;
+                        await context.SaveChangesAsync();
+                    }
+                }
             }
+        }
+
+        private string FormatMessage(Sensor sensor, Alert alert, Reading reading)
+        {
+            DateTime time = reading.Time.ToLocalTime();
+            string query = $"from={time.ToUtcString()}";
+            string url = $"{options.Hostname}/{sensor.DeviceId}/{sensor.SensorId}?{query}";
+            return $@"<a href=""{url}"">{sensor.NameOrId()}</a> reached limit of {alert.Limit} with {reading.Value} on {time}";
         }
     }
 }
