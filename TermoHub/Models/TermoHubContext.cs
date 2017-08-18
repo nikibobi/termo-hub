@@ -76,6 +76,9 @@ namespace TermoHub.Models
                     .HasMaxLength(320)
                     .IsRequired();
 
+                alert.Property(a => a.IsNotified)
+                    .HasDefaultValue(false);
+
                 alert.HasKey(a => a.AlertId);
 
                 alert

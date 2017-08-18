@@ -12,6 +12,10 @@
         /// </summary>
         public double Limit { get; set; }
         public string Email { get; set; }
+        /// <summary>
+        /// If an e-mail was sent
+        /// </summary>
+        public bool IsNotified { get; set; }
 
         public Sensor Sensor { get; set; }
 
