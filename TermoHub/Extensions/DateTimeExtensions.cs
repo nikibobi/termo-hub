@@ -4,9 +4,9 @@ namespace TermoHub.Extensions
 {
     public static class DateTimeExtensions
     {
-        public static string ToUtcString(this DateTime? date)
+        public static string ToUtcString(this DateTime date)
         {
-            return date?.ToString("yyyy-MM-ddTHH:mm:ss") ?? String.Empty;
+            return date.ToString("yyyy-MM-ddTHH:mm:ss");
         }
     }
 }

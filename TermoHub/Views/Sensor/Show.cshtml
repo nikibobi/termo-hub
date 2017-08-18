@@ -5,8 +5,8 @@
     ViewData["Title"] = sensor.NameOrId();
     var fromDate = (DateTime?)ViewData["from"];
     var toDate = (DateTime?)ViewData["to"];
-    string from = fromDate.ToUtcString();
-    string to = toDate.ToUtcString();
+    string from = fromDate?.ToUtcString();
+    string to = toDate?.ToUtcString();
     string filename = $"report{fromDate:ddMMyy}-{toDate:ddMMyy}.csv"; 
 }
 
