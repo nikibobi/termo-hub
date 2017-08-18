@@ -33,6 +33,7 @@ namespace TermoHub
 
             services.AddOptions();
             services.Configure<EmailOptions>(Configuration.GetSection("Email"));
+            services.Configure<ReporterOptions>(Configuration.GetSection("Reporter"));
 
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<TermoHubContext>(options => options.UseSqlServer(connection));
