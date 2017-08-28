@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "name": "termo-hub",
+  "private": true,
+  "dependencies": {
+    "@types/chart.js": "2.6.0",
+    "@types/jquery": "3.2.1"
+  },
+  "devDependencies": {
+    "gulp": "3.9.1",
+    "del": "3.0.0"
+  }
+}
