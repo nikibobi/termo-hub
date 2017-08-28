@@ -1,4 +1,4 @@
-﻿async function makeChartLive(baseUrl, maxPoints, interval) {
+﻿async function makeChartLive(baseUrl: string, maxPoints: number, interval: number) {
     let chart = makeChart('canvas');
     setInterval(tick, interval);
 
@@ -6,7 +6,7 @@
         await updateChart.call(chart, baseUrl, getFromDate(chart.data.labels), null, maxPoints); 
     }
 
-    function getFromDate(points) {
+    function getFromDate(points: any[]) {
         let date;
         if (points.length > 0) {
             date = new Date(points[points.length - 1]);
@@ -18,22 +18,23 @@
     }
 }
 
-async function makeChartStatic(baseUrl, from, to) {
+async function makeChartStatic(baseUrl: string, from: string, to: string) {
     let chart = makeChart('canvas');
     await updateChart.call(chart, baseUrl, from, to, Infinity);
 }
 
-function makeChart(id) {
-    const ctx = document.getElementById(id).getContext('2d');
+function makeChart(id: string) {
+    const canvas = document.getElementById(id) as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
     const unit = '°C';
-    const data = {
+    const data: Chart.ChartData = {
         labels: [],
         datasets: [
             makeDataset('Temp', 'seagreen', 'lightgreen'),
             makeDataset('Alert', 'red', '#ffa07a')
         ]
     };
-    const options = {
+    const options: Chart.ChartOptions = {
         scales: {
             xAxes: [{
                 type: 'time',
@@ -60,22 +61,16 @@ function makeChart(id) {
         },
         tooltips: {
             callbacks: {
-                label: function (item) {
-                    return `Temp: ${item.yLabel.toFixed(2)} ${unit}`;
-                },
-                labelColor: function (item) {
-                    return {
-                        borderColor: 'seagreen',
-                        backgroundColor: 'lightgreen'
-                    };
+                label: function (item: Chart.ChartTooltipItem) {
+                    return `Temp: ${Number(item.yLabel).toFixed(2)} ${unit}`;
                 }
             }
         }
     };
-    let chart = new Chart.Line(ctx, { data, options });
+    let chart = new Chart(ctx, { type: 'line', data, options });
     return chart;
 
-    function makeDataset(name, mainColor, altColor) {
+    function makeDataset(name: string, mainColor: string, altColor: string): Chart.ChartDataSets {
         return {
             label: name,
             fill: false,
@@ -87,17 +82,17 @@ function makeChart(id) {
             pointBorderColor: mainColor,
             pointHoverBorderColor: 'white',
             pointBackgroundColor: altColor,
-            pointHoverBackgroundColor: mainColor,
-            spanGaps: true, // used to draw lines where data is null
-            data: []
-        }
+            pointHoverBackgroundColor: mainColor, 
+            data: [],
+            spanGaps: "true" // used to draw lines where data is null
+        };
     }
 }
 
-async function updateChart(baseUrl, from, to, maxPoints) {
+async function updateChart(baseUrl: string, from: string, to: string, maxPoints: number) {
     let points = this.data.labels;
-    const data = await getDataJson(baseUrl, from, to);
-    const alert = await getAlertJson(baseUrl);
+    const data: Data[] = await getDataJson(baseUrl, from, to);
+    const alert: Alert = await getAlertJson(baseUrl);
     // add new data
     appendData.call(this, data);
     if (alert != null) {
@@ -113,17 +108,23 @@ async function updateChart(baseUrl, from, to, maxPoints) {
     this.update();
 }
 
-function getAlertJson(baseUrl) {
+function getAlertJson(baseUrl: string): JQuery.jqXHR<Alert> {
     const url = `${baseUrl}/alert`;
     return $.get(url);
 }
 
-function getDataJson(baseUrl, from, to) {
+function getDataJson(baseUrl: string, from: string, to: string): JQuery.jqXHR<Data[]> {
     const url = `${baseUrl}/data.json?from=${encodeURI(from)}&to=${encodeURI(to)}`;
     return $.get(url);
 }
 
-function appendData(data) {
+interface Data
+{
+    time: string,
+    value: number
+}
+
+function appendData(data: Data[]) {
     let labels = this.data.labels;
     let dataset = this.data.datasets[0];
     for (let d of data) {
@@ -132,7 +133,13 @@ function appendData(data) {
     }
 }
 
-function appendAlert(alert, n) {
+interface Alert
+{
+    sign: number,
+    value: number
+}
+
+function appendAlert(alert: Alert, n: number) {
     let dataset = this.data.datasets[1];
     dataset.fill = getAlertFill(alert.sign);
 
@@ -144,7 +151,7 @@ function appendAlert(alert, n) {
     dataset.data[0] = alert.value;
     dataset.data[dataset.data.length - 1] = alert.value;
 
-    function getAlertFill(sign) {
+    function getAlertFill(sign: number) {
         if (sign < 0) {
             return 'bottom';
         } else if (sign > 0) {
@@ -155,7 +162,7 @@ function appendAlert(alert, n) {
     }
 }
 
-function discardData(n) {
+function discardData(n: number) {
     let labels = this.data.labels;
     let dataset = this.data.datasets[0];
     for (let i = 0; i < n; i++) {
