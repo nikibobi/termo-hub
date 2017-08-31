@@ -1,5 +1,5 @@
 ﻿async function makeChartLive(baseUrl: string, maxPoints: number, interval: number) {
-    let chart = makeChart('canvas');
+    const chart = makeChart('canvas');
     setInterval(tick, interval);
 
     async function tick() {
@@ -19,7 +19,7 @@
 }
 
 async function makeChartStatic(baseUrl: string, from: string, to: string) {
-    let chart = makeChart('canvas');
+    const chart = makeChart('canvas');
     await updateChart.call(chart, baseUrl, from, to, Infinity);
 }
 
@@ -67,7 +67,7 @@ function makeChart(id: string) {
             }
         }
     };
-    let chart = new Chart(ctx, { type: 'line', data, options });
+    const chart = new Chart(ctx, { type: 'line', data, options });
     return chart;
 
     function makeDataset(name: string, mainColor: string, altColor: string): Chart.ChartDataSets {
@@ -90,7 +90,7 @@ function makeChart(id: string) {
 }
 
 async function updateChart(baseUrl: string, from: string, to: string, maxPoints: number) {
-    let points = this.data.labels;
+    const points = this.data.labels;
     // add new data
     const data: Data[] = await getDataJson(baseUrl, from, to);
     appendData.call(this, data);
@@ -125,8 +125,8 @@ interface Data
 }
 
 function appendData(data: Data[]) {
-    let labels = this.data.labels;
-    let dataset = this.data.datasets[0];
+    const labels = this.data.labels;
+    const dataset = this.data.datasets[0];
     for (let d of data) {
         labels.push(Date.parse(d.time));
         dataset.data.push(d.value);
@@ -140,7 +140,7 @@ interface Alert
 }
 
 function appendAlert(alert: Alert, n: number) {
-    let dataset = this.data.datasets[1];
+    const dataset = this.data.datasets[1];
     dataset.fill = getAlertFill(alert.sign);
 
     // insert nulls at [1]
@@ -163,8 +163,8 @@ function appendAlert(alert: Alert, n: number) {
 }
 
 function discardData(n: number) {
-    let labels = this.data.labels;
-    let dataset = this.data.datasets[0];
+    const labels = this.data.labels;
+    const dataset = this.data.datasets[0];
     for (let i = 0; i < n; i++) {
         labels.shift();
         dataset.data.shift();
