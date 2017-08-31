@@ -6,8 +6,8 @@
         await updateChart.call(chart, baseUrl, getFromDate(chart.data.labels), null, maxPoints); 
     }
 
-    function getFromDate(points: any[]) {
-        let date;
+    function getFromDate(points: any[]): string {
+        let date: Date;
         if (points.length > 0) {
             date = new Date(points[points.length - 1]);
         } else {
@@ -23,7 +23,7 @@ async function makeChartStatic(baseUrl: string, from: string, to: string) {
     await updateChart.call(chart, baseUrl, from, to, Infinity);
 }
 
-function makeChart(id: string) {
+function makeChart(id: string): Chart {
     const canvas = document.getElementById(id) as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
     const unit = '°C';
@@ -151,7 +151,7 @@ function appendAlert(alert: Alert, n: number) {
     dataset.data[0] = alert.value;
     dataset.data[dataset.data.length - 1] = alert.value;
 
-    function getAlertFill(sign: number) {
+    function getAlertFill(sign: number): string | boolean {
         if (sign < 0) {
             return 'bottom';
         } else if (sign > 0) {
