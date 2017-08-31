@@ -91,19 +91,19 @@ function makeChart(id: string) {
 
 async function updateChart(baseUrl: string, from: string, to: string, maxPoints: number) {
     let points = this.data.labels;
-    const data: Data[] = await getDataJson(baseUrl, from, to);
-    const alert: Alert = await getAlertJson(baseUrl);
     // add new data
+    const data: Data[] = await getDataJson(baseUrl, from, to);
     appendData.call(this, data);
-    if (alert != null) {
-        const n = points.length;
-        // update alert line
-        appendAlert.call(this, alert, n);
-    }
+    // delete old data
     if (points.length > maxPoints) {
         const n = points.length - maxPoints;
-        // delete old data
         discardData.call(this, n);
+    }
+    // update alert line
+    const alert: Alert = await getAlertJson(baseUrl);
+    if (alert != null) {
+        const n = points.length;
+        appendAlert.call(this, alert, n);
     }
     this.update();
 }
