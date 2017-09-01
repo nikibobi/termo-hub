@@ -31,25 +31,22 @@ namespace TermoHub.Services
             Alert alert = sensor.Alert;
             if (alert != null)
             {
-                if (alert.Check(reading.Value))
+                bool isAlert = alert.Check(reading.Value);
+                if (isAlert != alert.IsNotified)
                 {
-                    if (!alert.IsNotified)
-                    {
-                        string message = FormatMessage(sensor, alert, reading);
-                        await emailSender.SendEmailAsync(alert.Email, options.Subject, message);
-                        alert.IsNotified = true;
-                        await context.SaveChangesAsync();
-                    }
-                }
-                else
-                {
-                    if (alert.IsNotified)
-                    {
-                        alert.IsNotified = false;
-                        await context.SaveChangesAsync();
-                    }
+                    alert.IsNotified = !alert.IsNotified;
+                    await context.SaveChangesAsync();
+                    string subject = FormatSubject(isAlert);
+                    string message = FormatMessage(sensor, alert, reading);
+                    await emailSender.SendEmailAsync(alert.Email, subject, message);
                 }
             }
+        }
+
+        private string FormatSubject(bool isOn)
+        {
+            string prefix = isOn ? options.OnPrefix : options.OffPrefix;
+            return $"{prefix} {options.Subject}";
         }
 
         private string FormatMessage(Sensor sensor, Alert alert, Reading reading)
