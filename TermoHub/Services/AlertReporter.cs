@@ -26,35 +26,40 @@ namespace TermoHub.Services
                 throw new ArgumentNullException(nameof(reading));
 
             await context.Entry(reading).Reference(r => r.Sensor).LoadAsync();
-            Sensor sensor = reading.Sensor;
-            await context.Entry(sensor).Reference(s => s.Alert).LoadAsync();
-            Alert alert = sensor.Alert;
-            if (alert != null)
+            await context.Entry(reading.Sensor).Reference(s => s.Alert).LoadAsync();
+            Alert alert = reading.Sensor.Alert;
+            if (alert == null)
+                return;
+
+            bool isAlert = alert.Check(reading.Value);
+            if (isAlert != alert.IsNotified)
             {
-                bool isAlert = alert.Check(reading.Value);
-                if (isAlert != alert.IsNotified)
-                {
-                    alert.IsNotified = !alert.IsNotified;
-                    await context.SaveChangesAsync();
-                    string subject = FormatSubject(isAlert);
-                    string message = FormatMessage(sensor, alert, reading);
-                    await emailSender.SendEmailAsync(alert.Email, subject, message);
-                }
+                alert.IsNotified = !alert.IsNotified;
+                await context.SaveChangesAsync();
+                string subject = FormatSubject(isAlert);
+                string message = FormatMessage(isAlert, reading);
+                await emailSender.SendEmailAsync(alert.Email, subject, message);
             }
         }
 
-        private string FormatSubject(bool isOn)
+        private string FormatSubject(bool isAlert)
         {
-            string prefix = isOn ? options.OnPrefix : options.OffPrefix;
+            string prefix = isAlert ? options.OnPrefix : options.OffPrefix;
             return $"{prefix} {options.Subject}";
         }
 
-        private string FormatMessage(Sensor sensor, Alert alert, Reading reading)
+        private string FormatMessage(bool isAlert, Reading reading)
         {
+            Sensor sensor = reading.Sensor;
+            Alert alert = sensor.Alert;
+            int minutes = options.MinutesMargin;
             DateTime time = reading.Time.ToLocalTime();
-            string query = $"from={time.ToUtcString()}";
+            string from = time.AddMinutes(-minutes).ToUtcString();
+            string to = time.AddMinutes(minutes).ToUtcString();
+            string query = $"from={from}&to={to}";
+            string term = isAlert ? "reached" : "fixed";
             string url = $"{options.Hostname}/{sensor.DeviceId}/{sensor.SensorId}?{query}";
-            return $@"<a href=""{url}"">{sensor.NameOrId()}</a> reached limit of {alert.Limit} with {reading.Value} on {time}";
+            return $@"<a href=""{url}"">{sensor.NameOrId()}</a> {term} limit of {alert.Limit} with {reading.Value} on {time}";
         }
     }
 }
