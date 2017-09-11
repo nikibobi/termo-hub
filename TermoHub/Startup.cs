@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
+using TermoHub.Extensions;
 using TermoHub.Formatters;
 using TermoHub.Models;
 using TermoHub.Options;
@@ -63,10 +64,9 @@ namespace TermoHub
                 app.UseExceptionHandler("/error");
             }
 
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                ServeUnknownFileTypes = true
-            });
+            app.UseStaticFilesWeb();
+            app.UseStaticFilesArduino("/files", "firmware", true);
+
             app.UseMvc();
         }
     }
