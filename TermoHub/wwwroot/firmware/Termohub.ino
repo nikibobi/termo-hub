@@ -12,6 +12,8 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BMP280.h>
+// am 2320 sensor
+#include <AM2320.h>
 
 #define ONEWIRE_PIN D4
 #define I2C_ADDRESS 0x76
@@ -27,6 +29,7 @@ DallasTemperature ds(&oneWire);
 DeviceAddress* addrs;
 int n;
 Adafruit_BMP280 bmp;
+AM2320 am;
 int deviceId;
 int sleep = DELAY / 1000;
 
@@ -67,6 +70,7 @@ void loop() {
 
   readDallasTemperatures();
   readBMP280Sensors();
+  readAM2320Sensors();
   
   delay(sleep * 1000); //ESP.deepSleep(sleep * 1000 * 1000);
 }
@@ -95,6 +99,19 @@ void readBMP280Sensors() {
   int altitudeId = I2C_ID_OFFSET + (1 << 6);
   float altitude = bmp.readAltitude();
   sendRequest(altitudeId, altitude);
+}
+
+void readAM2320Sensors() {
+  if (am.Read() != 0)
+    return;
+  // humidity
+  int humidityId = I2C_ID_OFFSET + (1 << 7);
+  float humidity = am.h;
+  sendRequest(humidityId, humidity);
+  // temperature
+  int temperatureId = I2C_ID_OFFSET + (1 << 8);
+  float temperature = am.t;
+  sendRequest(temperatureId, temperature);
 }
 
 void sendRequest(int sensorId, float value) {
