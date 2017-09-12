@@ -1,5 +1,5 @@
-﻿async function makeChartLive(baseUrl: string, maxPoints: number, interval: number) {
-    const chart = makeChart('canvas');
+﻿async function makeChartLive(baseUrl: string, unit: string, maxPoints: number, interval: number) {
+    const chart = makeChart('canvas', unit);
     setInterval(tick, interval);
 
     async function tick() {
@@ -18,15 +18,14 @@
     }
 }
 
-async function makeChartStatic(baseUrl: string, from: string, to: string) {
-    const chart = makeChart('canvas');
+async function makeChartStatic(baseUrl: string, unit: string, from: string, to: string) {
+    const chart = makeChart('canvas', unit);
     await updateChart.call(chart, baseUrl, from, to, Infinity);
 }
 
-function makeChart(id: string): Chart {
+function makeChart(id: string, unit: string): Chart {
     const canvas = document.getElementById(id) as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
-    const unit = '°C';
     const data: Chart.ChartData = {
         labels: [],
         datasets: [

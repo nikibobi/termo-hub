@@ -31,7 +31,8 @@ namespace TermoHub.Controllers
                 Title = s.NameOrId(),
                 Id = s.SensorId,
                 Url = $"/{s.DeviceId}/{s.SensorId}",
-                Value = lastValues.GetSensorLastValue(s.DeviceId, s.SensorId)
+                Value = lastValues.GetSensorLastValue(s.DeviceId, s.SensorId),
+                Unit = s.Unit
             });
             ViewData["Title"] = "Sensors";
             return View(model: cards);
@@ -75,7 +76,7 @@ namespace TermoHub.Controllers
 
         // POST: /devId/senId/settings
         [HttpPost("/{devId}/{senId}/settings")]
-        public IActionResult Update([FromRoute] int devId, [FromRoute] int senId, [FromForm] string name, [FromForm] bool hasAlert, [FromForm] Alert alert)
+        public IActionResult Update([FromRoute] int devId, [FromRoute] int senId, [FromForm] string name, [FromForm] string unit, [FromForm] bool hasAlert, [FromForm] Alert alert)
         {
             Sensor sensor = context.Sensors.Find(devId, senId);
             if (sensor == null)
@@ -83,6 +84,7 @@ namespace TermoHub.Controllers
 
             context.Entry(sensor).Reference(s => s.Alert).Load();
             sensor.Name = name;
+            sensor.Unit = unit;
             if (hasAlert && sensor.Alert != null)
             {
                 sensor.Alert.Sign = alert.Sign;

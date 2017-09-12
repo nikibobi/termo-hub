@@ -26,8 +26,7 @@ namespace TermoHub.Controllers
             {
                 Title = d.NameOrId(),
                 Id = d.DeviceId,
-                Url = $"/{d.DeviceId}",
-                Value = lastValues.GetDeviceLastValuesAverage(d.DeviceId)
+                Url = $"/{d.DeviceId}"
             });
             ViewData["Title"] = "TermoHub";
             return View(model: cards);
@@ -48,7 +47,8 @@ namespace TermoHub.Controllers
                 Title = s.NameOrId(),
                 Id = s.SensorId,
                 Url = $"/{s.DeviceId}/{s.SensorId}",
-                Value = lastValues.GetSensorLastValue(s.DeviceId, s.SensorId)
+                Value = lastValues.GetSensorLastValue(s.DeviceId, s.SensorId),
+                Unit = s.Unit
             });
             return View(model: cards);
         }
