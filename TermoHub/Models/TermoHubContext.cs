@@ -49,6 +49,12 @@ namespace TermoHub.Models
 
                 sensor.Property(s => s.Name).IsName();
 
+                sensor.Property(s => s.Unit)
+                    .IsRequired(true)
+                    .IsUnicode(true)
+                    .HasMaxLength(10)
+                    .HasDefaultValue("°C");
+
                 sensor.HasKey(s => new { s.DeviceId, s.SensorId });
 
                 sensor
