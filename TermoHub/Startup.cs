@@ -30,7 +30,7 @@ namespace TermoHub
             services.Configure<ReporterOptions>(Configuration.GetSection("Reporter"));
 
             string connection = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<TermoHubContext>(options => options.UseSqlServer(connection));
+            services.AddDbContextPool<TermoHubContext>(options => options.UseSqlServer(connection));
 
             services.AddMvc(options =>
             {
