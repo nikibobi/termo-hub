@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using TermoHub.Models;
 
 namespace TermoHub.Services
@@ -9,17 +11,20 @@ namespace TermoHub.Services
     {
         private readonly IDictionary<int, IDictionary<int, double>> cache;
 
-        public LastValues(TermoHubContext context)
+        public LastValues(IServiceScopeFactory serviceScopeFactory)
         {
             cache = new ConcurrentDictionary<int, IDictionary<int, double>>();
-            LoadFromDatabase(context);
+            using (var scope = serviceScopeFactory.CreateScope())
+            using (var context = scope.ServiceProvider.GetRequiredService<TermoHubContext>())
+            {
+                LoadFromDatabase(context);
+            }
         }
 
         private void LoadFromDatabase(TermoHubContext context)
         {
-            foreach (var sensor in context.Sensors)
+            foreach (var sensor in context.Sensors.Include(s => s.Readings))
             {
-                context.Entry(sensor).Collection(s => s.Readings).Load();
                 double last = sensor.Readings
                     .OrderByDescending(r => r.Time)
                     .Select(r => r.Value)
