@@ -1,6 +1,7 @@
 ﻿/// <binding AfterBuild='default' Clean='clean' />
 
 var gulp = require('gulp');
+var changed = require('gulp-changed');
 var del = require('del');
 
 var paths = {
@@ -13,5 +14,7 @@ gulp.task('clean', function () {
 });
 
 gulp.task('default', function () {
-    gulp.src(paths.scripts).pipe(gulp.dest(paths.dest));
+    gulp.src(paths.scripts)
+        .pipe(changed(paths.dest))
+        .pipe(gulp.dest(paths.dest));
 });
