@@ -267,3 +267,6 @@ appsettings.json
 **/wwwroot/js/
 **/scripts/**/*.map
 **/scripts/**/*.js
+
+# VS Code
+.vscode/
