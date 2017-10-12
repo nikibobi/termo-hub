@@ -19,8 +19,8 @@
 #define I2C_ADDRESS 0x76
 #define I2C_ID_OFFSET 65535
 #define DELAY 5000
-#define HOST "192.168.2.4"
-#define PORT 80
+#define HOST "212.25.35.65"
+#define PORT 5000
 #define SSID "TermoHub"
 #define PASS "12345678"
 
@@ -28,6 +28,7 @@ OneWire oneWire(ONEWIRE_PIN);
 DallasTemperature ds(&oneWire);
 DeviceAddress* addrs;
 int n;
+bool bmpFound;
 Adafruit_BMP280 bmp;
 AM2320 am;
 int deviceId;
@@ -55,18 +56,22 @@ void setupDallasTemperatures() {
   for (int i = 0; i < n; i++) {
     ds.getAddress(addrs[i], i);
   }
-  Serial.println(String(n) + " devices found");
+  if (n > 0) {
+    Serial.println(String(n) + " devices found");
+  }
 }
 
 void setupBMP280Sensors() {
-  if (bmp.begin(I2C_ADDRESS)) {
+  bmpFound = bmp.begin(I2C_ADDRESS);
+  if (bmpFound) {
     Serial.println("BMP280 sensor found");
   }
 }
 
 void loop() {
-  if (WiFi.status() != WL_CONNECTED)
+  if (WiFi.status() != WL_CONNECTED) {
     return;
+  }
 
   readDallasTemperatures();
   readBMP280Sensors();
@@ -79,14 +84,18 @@ void readDallasTemperatures() {
   for (int i = 0; i < n; i++) {
     ds.requestTemperaturesByAddress(addrs[i]);
     float value = ds.getTempC(addrs[i]);
-    if (value == -127)
+    if (value == -127) {
       continue;
+    }
     int sensorId = addrs[i][2] << 8 + addrs[i][3];
     sendRequest(sensorId, value);
   }
 }
 
 void readBMP280Sensors() {
+  if (!bmpFound) {
+    return;
+  }
   // temperature
   int temperatureId = I2C_ID_OFFSET + (1 << 4);
   float temperature = bmp.readTemperature();
@@ -102,8 +111,9 @@ void readBMP280Sensors() {
 }
 
 void readAM2320Sensors() {
-  if (am.Read() != 0)
+  if (am.Read() != 0) {
     return;
+  }
   // humidity
   int humidityId = I2C_ID_OFFSET + (1 << 7);
   float humidity = am.h;
