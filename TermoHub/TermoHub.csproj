@@ -11,14 +11,6 @@
     </Content>
   </ItemGroup>
 
-  <Target Name="GulpClean" AfterTargets="Clean">
-    <Exec Command="./node_modules/.bin/gulp clean" />
-  </Target>
-
-  <Target Name="GulpBuild" AfterTargets="Build">
-    <Exec Command="./node_modules/.bin/gulp default" />
-  </Target>
-
   <ItemGroup>
     <PackageReference Include="MailKit" Version="1.16.2" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.1" />
