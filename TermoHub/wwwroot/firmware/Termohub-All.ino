@@ -14,6 +14,8 @@
 #include <Adafruit_BMP280.h>
 // am 2320 sensor
 #include <AM2320.h>
+// lcd 16x2 i2c
+#include <LiquidCrystal_I2C.h>
 
 #define ONEWIRE_PIN D4
 #define I2C_ADDRESS 0x76
@@ -23,6 +25,7 @@
 #define PORT 5000
 #define SSID "TermoHub"
 #define PASS "12345678"
+#define LCD_ADDRESS 0x27
 
 OneWire oneWire(ONEWIRE_PIN);
 DallasTemperature ds(&oneWire);
@@ -31,6 +34,7 @@ int n;
 bool bmpFound;
 Adafruit_BMP280 bmp;
 AM2320 am;
+LiquidCrystal_I2C lcd(LCD_ADDRESS, 16, 2);
 int deviceId;
 int sleep = DELAY / 1000;
 
@@ -45,8 +49,14 @@ void setup() {
   deviceId = ESP.getChipId();
   Serial.println("Device Id: " + String(deviceId));
 
+  setupLCD();
   setupDallasTemperatures();
   setupBMP280Sensors();
+}
+
+void setupLCD() {
+  lcd.init();
+  lcd.backlight();
 }
 
 void setupDallasTemperatures() {
@@ -88,6 +98,8 @@ void readDallasTemperatures() {
       continue;
     }
     int sensorId = addrs[i][2] << 8 + addrs[i][3];
+    lcd.setCursor(0, i % 2);
+    lcd.print("T" + String(i) + " " + String(value, 2) + String((char)223) + "C");
     sendRequest(sensorId, value);
   }
 }
