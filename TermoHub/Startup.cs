@@ -39,7 +39,7 @@ namespace TermoHub
             });
 
             services.AddSingleton<ILastValues, LastValues>();
-            services.AddTransient<IEmailSender, MailKitEmailService>();
+            services.AddTransient<IEmailSender, DotnetEmailService>();
             services.AddTransient<IAlertReporter, AlertReporter>();
         }
 
