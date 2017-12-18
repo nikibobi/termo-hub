@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using TermoHub.Extensions;
 
 namespace TermoHub.Models
 {
-    public class TermoHubContext : DbContext
+    public class TermoHubContext : IdentityDbContext<User>
     {
         private const int DefaultDelaySeconds = 30;
 
@@ -40,6 +41,12 @@ namespace TermoHub.Models
                     .WithOne(s => s.Device)
                     .HasForeignKey(s => s.DeviceId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                device
+                    .HasOne(d => d.Owner)
+                    .WithMany(u => u.Devices)
+                    .HasForeignKey(d => d.OwnerId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<Sensor>(sensor =>

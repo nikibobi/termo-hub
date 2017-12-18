@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,9 +29,14 @@ namespace TermoHub
             services.AddOptions();
             services.Configure<EmailOptions>(Configuration.GetSection("Email"));
             services.Configure<ReporterOptions>(Configuration.GetSection("Reporter"));
+            services.Configure<PasswordOptions>(Configuration.GetSection("Password"));
 
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<TermoHubContext>(options => options.UseSqlServer(connection));
+
+            services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<TermoHubContext>()
+                .AddDefaultTokenProviders();
 
             services.AddMvc(options =>
             {
@@ -55,6 +61,7 @@ namespace TermoHub
             }
 
             app.UseStaticFilesWeb();
+            app.UseAuthentication();
             app.UseStaticFilesArduino("/files", "firmware", true);
 
             app.UseMvc();
