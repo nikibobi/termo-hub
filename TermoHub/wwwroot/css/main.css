@@ -31,19 +31,51 @@ ul.cards {
 }
 
 li.card {
+    /* position */
     display: inline-block;
-    background-color: seagreen;
-    transition: background-color 0.25s ease-out;
+    position: relative;
+    /* border */
     border: 1px solid darkgreen;
     border-radius: 4px;
     /* sizeing */
-    padding: 2px 5px;
     margin: 5px;
+}
+
+.card a {
+    /* remove underline from links */
+    text-decoration: none;
+}
+
+.card-main {
+    /* background */
+    background-color: seagreen;
+    transition: background-color 0.25s ease-out;
+    /* sizeing */
+    padding: 2px 5px;
     width: 300px;
     height: 90px;
 }
 
-li.card:hover {
+.card-main:hover {
+    background-color: lightgreen;
+    cursor: pointer;
+}
+
+.card-gear {
+    /* position */
+    position: absolute;
+    top: 0;
+    right: 0;
+    /* background */
+    background-color: seagreen;
+    transition: background-color 0.25s ease-out;
+    /* border */
+    border-left: 1px solid darkgreen;
+    border-bottom: 1px solid darkgreen;
+    border-bottom-left-radius: 4px;
+}
+
+.card-gear:hover {
     background-color: lightgreen;
     cursor: pointer;
 }
@@ -77,13 +109,4 @@ li.card:hover {
 .temp-unit {
     color: white;
     opacity: 0.5;
-}
-
-/* termometer icon fill and outline */
-.icon-in {
-    fill: cornflowerblue;
-}
-
-.icon-out {
-    fill: white;
 }
