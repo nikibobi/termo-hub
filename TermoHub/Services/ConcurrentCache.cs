@@ -7,12 +7,12 @@ using TermoHub.Models;
 
 namespace TermoHub.Services
 {
-    public class LastValues : ILastValues
+    public class ConcurrentCache : ILastValues
     {
         private readonly IDictionary<(int, int), double> cache;
         private readonly IServiceScopeFactory serviceScopeFactory;
 
-        public LastValues(IServiceScopeFactory serviceScopeFactory)
+        public ConcurrentCache(IServiceScopeFactory serviceScopeFactory)
         {
             cache = new ConcurrentDictionary<(int, int), double>();
             this.serviceScopeFactory = serviceScopeFactory;

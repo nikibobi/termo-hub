@@ -38,7 +38,7 @@ namespace TermoHub
                 options.FormatterMappings.SetMediaTypeMappingForFormat("csv", "text/csv");
             });
 
-            services.AddSingleton<ILastValues, LastValues>();
+            services.AddSingleton<ILastValues, ConcurrentCache>();
             services.AddTransient<IEmailSender, DotnetEmailService>();
             services.AddTransient<IAlertReporter, AlertReporter>();
         }
