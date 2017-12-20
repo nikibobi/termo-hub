@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TermoHub.Models;
 using TermoHub.ViewModels;
@@ -9,31 +10,36 @@ using TermoHub.Services;
 
 namespace TermoHub.Controllers
 {
+    [Authorize]
     public class SensorController : Controller
     {
         private static readonly TimeSpan HistoryInterval = TimeSpan.FromHours(3);
 
         private readonly TermoHubContext context;
         private readonly ILastValues lastValues;
+        private readonly IAuthorizationService authorization;
 
-        public SensorController(TermoHubContext context, ILastValues lastValues)
+        public SensorController(TermoHubContext context, ILastValues lastValues, IAuthorizationService authorization)
         {
             this.context = context;
             this.lastValues = lastValues;
+            this.authorization = authorization;
         }
 
         // GET: /sensors
         [HttpGet("/sensors")]
         public IActionResult List()
         {
-            var cards = context.Sensors.Select(s => new Card()
-            {
-                Title = s.NameOrId(),
-                Id = s.SensorId,
-                Url = $"/{s.DeviceId}/{s.SensorId}",
-                Value = lastValues.GetSensorLastValue(s.DeviceId, s.SensorId),
-                Unit = s.Unit
-            });
+            var cards = context.Sensors
+                .Where(IsAuthorized)
+                .Select(s => new Card()
+                {
+                    Title = s.NameOrId(),
+                    Id = s.SensorId,
+                    Url = $"/{s.DeviceId}/{s.SensorId}",
+                    Value = lastValues.GetSensorLastValue(s.DeviceId, s.SensorId),
+                    Unit = s.Unit
+                });
             ViewData["Title"] = "Sensors";
             return View(model: cards);
         }
@@ -45,6 +51,9 @@ namespace TermoHub.Controllers
             Sensor sensor = context.Sensors.Find(devId, senId);
             if (sensor == null)
                 return NotFound();
+
+            if (!IsAuthorized(sensor))
+                return Forbid();
 
             (ViewData["from"], ViewData["to"]) = DefaultDates(from, to);
 
@@ -59,6 +68,9 @@ namespace TermoHub.Controllers
             if (sensor == null)
                 return NotFound();
 
+            if (!IsAuthorized(sensor))
+                return Forbid();
+
             return View(model: sensor);
         }
 
@@ -69,6 +81,9 @@ namespace TermoHub.Controllers
             Sensor sensor = context.Sensors.Find(devId, senId);
             if (sensor == null)
                 return NotFound();
+
+            if (!IsAuthorized(sensor))
+                return Forbid();
 
             context.Entry(sensor).Reference(s => s.Alert).Load();
             return View(model: sensor);
@@ -81,6 +96,9 @@ namespace TermoHub.Controllers
             Sensor sensor = context.Sensors.Find(devId, senId);
             if (sensor == null)
                 return NotFound();
+
+            if (!IsAuthorized(sensor))
+                return Forbid();
 
             context.Entry(sensor).Reference(s => s.Alert).Load();
             sensor.Name = name;
@@ -133,6 +151,13 @@ namespace TermoHub.Controllers
                 return Json(data: null);
 
             return Json(data: new { Value = alert.Limit, Sign = alert.Sign });
+        }
+
+        private bool IsAuthorized(Sensor sensor)
+        {
+            context.Entry(sensor).Reference(s => s.Device).Load();
+            var result = authorization.AuthorizeAsync(User, sensor.Device, "DeviceOwned").GetAwaiter().GetResult();
+            return result.Succeeded;
         }
 
         private static (DateTime from, DateTime to) DefaultDates(DateTime? fromNullable, DateTime? toNullable)

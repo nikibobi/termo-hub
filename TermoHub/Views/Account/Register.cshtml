@@ -1,0 +1,22 @@
+﻿@model Register
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1 class="title">@ViewData["Title"]</h1>
+
+<form class="form" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+    <div asp-validation-summary="All"></div>
+
+    <label asp-for="Username"></label>
+    <input asp-for="Username" />
+
+    <label asp-for="Email"></label>
+    <input asp-for="Email" />
+
+    <label asp-for="Password"></label>
+    <input asp-for="Password" />
+
+    <input type="submit" value="@ViewData["Title"]" />
+</form>

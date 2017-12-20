@@ -13,15 +13,14 @@ body {
     transition: border-bottom-color 0.2s ease;
 }
 
-.title:hover {
-    border-bottom-color: lightgreen;
-}
+    .title:hover {
+        border-bottom-color: lightgreen;
+    }
 
 ul.cards {
     /* removes bullets and padding */
     list-style: none;
     padding: 0;
-
     /* for div ordering */
     display: flex;
     flex-direction: row;
@@ -56,10 +55,10 @@ li.card {
     height: 90px;
 }
 
-.card-main:hover {
-    background-color: lightgreen;
-    cursor: pointer;
-}
+    .card-main:hover {
+        background-color: lightgreen;
+        cursor: pointer;
+    }
 
 .card-gear {
     /* position */
@@ -75,10 +74,10 @@ li.card {
     border-bottom-left-radius: 4px;
 }
 
-.card-gear:hover {
-    background-color: lightgreen;
-    cursor: pointer;
-}
+    .card-gear:hover {
+        background-color: lightgreen;
+        cursor: pointer;
+    }
 
 .card-title {
     text-align: center;
@@ -109,4 +108,48 @@ li.card {
 .temp-unit {
     color: white;
     opacity: 0.5;
+}
+
+/* forms and input */
+
+.validation-summary-errors ul {
+    list-style: none;
+    text-align: left;
+    padding: 0;
+    padding-left: calc(150px + 8px);
+}
+
+    .validation-summary-errors ul li {
+        display: inline-block;
+        text-align: left;
+        background-color: rgba(255, 0, 0, 0.2);
+        border-left: 4px solid red;
+        margin-bottom: 2px;
+        padding: 1px 6px;
+    }
+
+.form label {
+    display: inline-block;
+    float: left;
+    clear: left;
+    margin: 2px 0;
+    width: 150px;
+    text-align: right;
+}
+
+.form input {
+    display: inline-block;
+    float: left;
+    margin: 2px 8px;
+}
+
+    .form input[type=submit] {
+        clear: both;
+        margin-left: calc(150px + 8px);
+    }
+
+.form {
+    display: block;
+    width: 50%;
+    margin: 0 auto;
 }
