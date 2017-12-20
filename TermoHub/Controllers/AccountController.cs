@@ -103,6 +103,23 @@ namespace TermoHub.Controllers
             return View(model);
         }
 
+        [HttpPost("/promote/{username}")]
+        [Authorize(Roles = Role.Admin)]
+        public async Task<IActionResult> Promote([FromRoute] string username)
+        {
+            var user = await userManager.FindByNameAsync(username);
+            if (user == null)
+                return NotFound();
+
+            var result = await userManager.AddToRoleAsync(user, Role.Admin);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
         [Route("/logout")]
         [Authorize]
         public async Task<IActionResult> Logout()
