@@ -1,13 +1,16 @@
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TermoHub.Services;
-using TermoHub.Models;
-using TermoHub.ViewModels;
-using TermoHub.Extensions;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace TermoHub.Controllers
 {
+    using Services;
+    using Models;
+    using ViewModels;
+    using Extensions;
+    using Authorization;
+
     [Authorize]
     public class DeviceController : Controller
     {
@@ -73,12 +76,22 @@ namespace TermoHub.Controllers
             if (!IsAuthorized(device))
                 return Forbid();
 
+            if (User.IsInRole(Role.Admin))
+            {
+                ViewBag.Owners = context.Users
+                    .Select(u => new SelectListItem()
+                    {
+                        Value = u.Id,
+                        Text = u.UserName
+                    }).ToList();
+            }
+
             return View(model: device);
         }
 
         // POST: /devId/settings
         [HttpPost("/{devId}/settings")]
-        public IActionResult Update([FromRoute] int devId, [FromForm] string name, [FromForm] int delaySeconds)
+        public IActionResult Update([FromRoute] int devId, [FromForm] string name, [FromForm] int delaySeconds, [FromForm] string ownerId)
         {
             Device device = context.Devices.Find(devId);
             if (device == null)
@@ -87,8 +100,12 @@ namespace TermoHub.Controllers
             if (!IsAuthorized(device))
                 return Forbid();
 
+            if (device.OwnerId != ownerId && !User.IsInRole(Role.Admin))
+                return Forbid();
+
             device.Name = name;
             device.DelaySeconds = delaySeconds;
+            device.OwnerId = ownerId;
             context.Update(device);
             context.SaveChanges();
             return Redirect($"/{devId}");

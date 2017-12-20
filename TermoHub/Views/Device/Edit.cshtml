@@ -5,11 +5,24 @@
 <form action="/@Model.DeviceId/settings" method="post">
     <label>
         Name:
-        <input type="text" name="name" value="@Model.Name" />
+        <input asp-for="Name" />
     </label>
     <label>
         Delay (seconds):
-        <input type="number" name="delaySeconds" value="@Model.DelaySeconds" min="10" max="@(60 * 60)" />
+        <input asp-for="DelaySeconds" min="10" max="@(60 * 60)" />
     </label>
+@if (User.IsInRole(Role.Admin))
+{
+    <label>
+        Owner:
+        <select asp-for="OwnerId" asp-items=ViewBag.Owners>
+            <option value="">none</option>
+        </select>
+    </label>
+}
+else
+{
+    <input type="hidden" asp-for="OwnerId" />
+}
     <input type="submit" value="Update" />
 </form>

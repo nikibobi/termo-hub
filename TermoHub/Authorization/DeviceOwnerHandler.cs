@@ -18,7 +18,7 @@ namespace TermoHub.Authorization
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext auth, DeviceOwnedRequirement requirement, Device device)
         {
             var user = await userManager.GetUserAsync(auth.User);
-            if (device.OwnerId == user.Id)
+            if (device.OwnerId == user?.Id)
             {
                 auth.Succeed(requirement);
             }
