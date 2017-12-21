@@ -91,6 +91,7 @@ namespace TermoHub.Controllers
 
         // POST: /devId/senId/settings
         [HttpPost("/{devId}/{senId}/settings")]
+        [ValidateAntiForgeryToken]
         public IActionResult Update([FromRoute] int devId, [FromRoute] int senId, [FromForm] string name, [FromForm] string unit, [FromForm] bool hasAlert, [FromForm] Alert alert)
         {
             Sensor sensor = context.Sensors.Find(devId, senId);

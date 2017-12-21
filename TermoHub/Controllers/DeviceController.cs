@@ -91,6 +91,7 @@ namespace TermoHub.Controllers
 
         // POST: /devId/settings
         [HttpPost("/{devId}/settings")]
+        [ValidateAntiForgeryToken]
         public IActionResult Update([FromRoute] int devId, [FromForm] string name, [FromForm] int delaySeconds, [FromForm] string ownerId)
         {
             Device device = context.Devices.Find(devId);
