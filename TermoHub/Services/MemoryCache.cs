@@ -1,21 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using TermoHub.Models;
+using System;
+using System.Linq;
 
 namespace TermoHub.Services
 {
-    public class LastValues : ILastValues
+    using Models;
+
+    public class MemoryCache : ILastValues
     {
-        private readonly IDictionary<(int, int), double> cache;
+        private static readonly TimeSpan Expiration = TimeSpan.FromMinutes(5);
+
+        private readonly IMemoryCache cache;
         private readonly IServiceScopeFactory serviceScopeFactory;
 
-        public LastValues(IServiceScopeFactory serviceScopeFactory)
+        public MemoryCache(IServiceScopeFactory serviceScopeFactory, IMemoryCache cache)
         {
-            cache = new ConcurrentDictionary<(int, int), double>();
             this.serviceScopeFactory = serviceScopeFactory;
+            this.cache = cache;
         }
 
         public double GetSensorLastValue(int deviceId, int sensorId)
@@ -39,7 +41,7 @@ namespace TermoHub.Services
 
         public void SetSensorLastValue(int deviceId, int sensorId, double value)
         {
-            cache[(deviceId, sensorId)] = value;
+            cache.Set((deviceId, sensorId), value, Expiration);
         }
     }
 }
