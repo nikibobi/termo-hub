@@ -17,6 +17,49 @@ body {
         border-bottom-color: lightgreen;
     }
 
+.sticky {
+    text-decoration: none;
+    /* position */
+    position: fixed;
+    display: inline-block;
+    /* background */
+    color: white;
+    background-color: seagreen;
+    transition: background-color 0.25s ease-out;
+    /* sizing */
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    height: 28px;
+}
+
+    .sticky:hover {
+        background-color: lightgreen;
+        cursor: pointer;
+    }
+
+.logout {
+    /* position */
+    top: 0;
+    right: 0;
+    /* border */
+    border-left: 1px solid darkgreen;
+    border-bottom: 1px solid darkgreen;
+    border-bottom-left-radius: 4px;
+}
+
+.username {
+    font-weight: bold;
+    padding: 4px;
+    /* position */
+    top: 0;
+    left: 0;
+    /* border */
+    border-right: 1px solid darkgreen;
+    border-bottom: 1px solid darkgreen;
+    border-bottom-right-radius: 4px;
+}
+
 ul.cards {
     /* removes bullets and padding */
     list-style: none;
