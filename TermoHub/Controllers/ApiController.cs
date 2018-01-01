@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TermoHub.Models;
+using System;
 using System.Threading.Tasks;
-using TermoHub.Services;
 
 namespace TermoHub
 {
+    using Models;
+    using Services;
+
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class ApiController : Controller
     {
         private readonly TermoHubContext context;

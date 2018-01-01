@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Globalization;
+using System.Security.Claims;
 using TermoHub.Authorization;
 using TermoHub.Extensions;
 using TermoHub.Formatters;
@@ -32,6 +34,7 @@ namespace TermoHub
             services.AddOptions();
             services.Configure<EmailOptions>(Configuration.GetSection("Email"));
             services.Configure<ReporterOptions>(Configuration.GetSection("Reporter"));
+            services.Configure<JwtOptions>(Configuration.GetSection("JWT"));
             services.Configure<IdentityOptions>(Configuration.GetSection("Identity"));
 
             string connection = Configuration.GetConnectionString("DefaultConnection");
@@ -49,6 +52,23 @@ namespace TermoHub
 
             services.AddScoped<IAuthorizationHandler, DeviceAdminHandler>();
             services.AddScoped<IAuthorizationHandler, DeviceOwnerHandler>();
+
+            services.AddAuthentication()
+                .AddCookie()
+                .AddJwtBearer(options =>
+                {
+                    var jwt = new JwtOptions();
+                    Configuration.Bind("JWT", jwt);
+
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        IssuerSigningKey = jwt.SecurityKey,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwt.Issuer,
+                        ValidAudience = jwt.Audience,
+                        RoleClaimType = ClaimTypes.Role
+                    };
+                });
 
             services.ConfigureApplicationCookie(options =>
             {

@@ -1,13 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace TermoHub.Controllers
 {
     using Authorization;
     using Models;
+    using Options;
     using vm = ViewModels;
 
     [AllowAnonymous]
@@ -58,6 +64,41 @@ namespace TermoHub.Controllers
                 }
             }
             return View(model);
+        }
+
+        [HttpPost("/token")]
+        public async Task<IActionResult> Token([FromBody] vm.Login model, [FromServices] IOptions<JwtOptions> options)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await userManager.FindByNameAsync(model.Username);
+                if (user != null)
+                {
+                    if (await userManager.CheckPasswordAsync(user, model.Password))
+                    {
+                        var claims = new List<Claim>()
+                        {
+                            new Claim(ClaimTypes.Name, user.UserName)
+                        };
+                        foreach (var role in await userManager.GetRolesAsync(user))
+                        {
+                            claims.Add(new Claim(ClaimTypes.Role, role));
+                        }
+                        var jwt = options.Value;
+                        var token = new JwtSecurityToken(
+                            issuer: jwt.Issuer,
+                            audience: jwt.Audience,
+                            claims: claims,
+                            notBefore: DateTime.Now,
+                            expires: jwt.Expires,
+                            signingCredentials: jwt.Credentials);
+
+                        var result = new JwtSecurityTokenHandler().WriteToken(token);
+                        return Ok(result);
+                    }
+                }
+            }
+            return BadRequest();
         }
 
         [HttpGet("/register")]
