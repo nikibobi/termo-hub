@@ -26,7 +26,7 @@ namespace TermoHub.Controllers
         }
 
         // GET: /devices
-        [HttpGet("/devices")]
+        [HttpGet]
         public IActionResult List()
         {
             var cards = context.Devices
@@ -42,7 +42,7 @@ namespace TermoHub.Controllers
         }
 
         // GET: /devId
-        [HttpGet("/{devId}")]
+        [HttpGet]
         public IActionResult Show([FromRoute] int devId)
         {
             Device device = context.Devices.Find(devId);
@@ -66,8 +66,8 @@ namespace TermoHub.Controllers
         }
 
         // GET: /devId/settings
-        [HttpGet("/{devId}/settings")]
-        public IActionResult Edit([FromRoute] int devId)
+        [HttpGet]
+        public IActionResult Settings([FromRoute] int devId)
         {
             Device device = context.Devices.Find(devId);
             if (device == null)
@@ -90,9 +90,9 @@ namespace TermoHub.Controllers
         }
 
         // POST: /devId/settings
-        [HttpPost("/{devId}/settings")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update([FromRoute] int devId, [FromForm] string name, [FromForm] int delaySeconds, [FromForm] string ownerId)
+        public IActionResult Settings([FromRoute] int devId, [FromForm] string name, [FromForm] int delaySeconds, [FromForm] string ownerId)
         {
             Device device = context.Devices.Find(devId);
             if (device == null)

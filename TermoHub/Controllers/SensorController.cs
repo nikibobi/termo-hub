@@ -27,7 +27,7 @@ namespace TermoHub.Controllers
         }
 
         // GET: /sensors
-        [HttpGet("/sensors")]
+        [HttpGet]
         public IActionResult List()
         {
             var cards = context.Sensors
@@ -45,7 +45,7 @@ namespace TermoHub.Controllers
         }
 
         // GET: /devId/senId
-        [HttpGet("/{devId}/{senId}")]
+        [HttpGet]
         public IActionResult Show([FromRoute] int devId, [FromRoute] int senId, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
             Sensor sensor = context.Sensors.Find(devId, senId);
@@ -61,7 +61,7 @@ namespace TermoHub.Controllers
         }
 
         // GET: /devId/senId/live
-        [HttpGet("/{devId}/{senId}/live")]
+        [HttpGet]
         public IActionResult Live([FromRoute] int devId, [FromRoute] int senId)
         {
             Sensor sensor = context.Sensors.Find(devId, senId);
@@ -75,8 +75,8 @@ namespace TermoHub.Controllers
         }
 
         // GET: /devId/senId/settings
-        [HttpGet("/{devId}/{senId}/settings")]
-        public IActionResult Edit([FromRoute] int devId, [FromRoute] int senId)
+        [HttpGet]
+        public IActionResult Settings([FromRoute] int devId, [FromRoute] int senId)
         {
             Sensor sensor = context.Sensors.Find(devId, senId);
             if (sensor == null)
@@ -90,9 +90,9 @@ namespace TermoHub.Controllers
         }
 
         // POST: /devId/senId/settings
-        [HttpPost("/{devId}/{senId}/settings")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update([FromRoute] int devId, [FromRoute] int senId, [FromForm] string name, [FromForm] string unit, [FromForm] bool hasAlert, [FromForm] Alert alert)
+        public IActionResult Settings([FromRoute] int devId, [FromRoute] int senId, [FromForm] string name, [FromForm] string unit, [FromForm] bool hasAlert, [FromForm] Alert alert)
         {
             Sensor sensor = context.Sensors.Find(devId, senId);
             if (sensor == null)
@@ -139,7 +139,7 @@ namespace TermoHub.Controllers
         }
 
         // GET: /devId/senId/alert
-        [HttpGet("/{devId}/{senId}/alert")]
+        [HttpGet]
         public IActionResult Alert([FromRoute] int devId, [FromRoute] int senId)
         {
             Sensor sensor = context.Sensors.Find(devId, senId);

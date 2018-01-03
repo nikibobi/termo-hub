@@ -78,6 +78,13 @@ namespace TermoHub
                 options.AccessDeniedPath = "/error";
             });
 
+            services.AddRouting(options =>
+            {
+                options.LowercaseUrls = true;
+                options.ConstraintMap["devId"] = typeof(int);
+                options.ConstraintMap["senId"] = typeof(int);
+            });
+
             services.AddMvc(options =>
             {
                 options.OutputFormatters.Add(new CsvOutputFormatter());
@@ -109,8 +116,29 @@ namespace TermoHub
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
+                    name: "account",
+                    template: "{action}",
+                    defaults: new { controller = "Account" });
+
+                routes.MapRoute(
+                    name: "list",
+                    template: "{controller}s",
+                    defaults: new { action = "List" });
+
+                routes.MapRoute(
+                    name: "device",
+                    template: "{devId}/{action}",
+                    defaults: new { controller = "Device", action = "Show" });
+
+                routes.MapRoute(
+                    name: "sensor",
+                    template: "{devId}/{senId}/{action}",
+                    defaults: new { controller = "Sensor", action = "Show" });
+
+                routes.MapRoute(
                     name: "default",
-                    template: "{controller=Main}/{action=Index}");
+                    template: "{action}",
+                    defaults: new { controller = "Main", action = "Index" });
             });
         }
     }

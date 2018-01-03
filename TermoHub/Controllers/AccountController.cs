@@ -32,7 +32,7 @@ namespace TermoHub.Controllers
             this.signInManager = signInManager;
         }
 
-        [HttpGet("/login")]
+        [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -40,7 +40,7 @@ namespace TermoHub.Controllers
             return View();
         }
 
-        [HttpPost("/login")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(vm.Login model, string returnUrl = null)
         {
@@ -66,7 +66,7 @@ namespace TermoHub.Controllers
             return View(model);
         }
 
-        [HttpPost("/token")]
+        [HttpPost]
         public async Task<IActionResult> Token([FromBody] vm.Login model, [FromServices] IOptions<JwtOptions> options)
         {
             if (ModelState.IsValid)
@@ -101,7 +101,7 @@ namespace TermoHub.Controllers
             return BadRequest();
         }
 
-        [HttpGet("/register")]
+        [HttpGet]
         public IActionResult Register(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -109,7 +109,7 @@ namespace TermoHub.Controllers
             return View();
         }
 
-        [HttpPost("/register")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(vm.Register model, string returnUrl = null)
         {
@@ -161,7 +161,6 @@ namespace TermoHub.Controllers
             return BadRequest();
         }
 
-        [Route("/logout")]
         [Authorize]
         public async Task<IActionResult> Logout()
         {
